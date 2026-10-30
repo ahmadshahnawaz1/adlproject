@@ -7,7 +7,8 @@
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Check } from 'lucide-react-native';
 import type { AdhkarCategory, AdhkarCategoryId } from '../content/adhkar';
-import { colors, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 export default function CategoryTabs({
   categories,
@@ -20,6 +21,8 @@ export default function CategoryTabs({
   completedIds: string[];
   onSelect: (id: AdhkarCategoryId) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <ScrollView
       horizontal
@@ -51,7 +54,7 @@ export default function CategoryTabs({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   row: { paddingHorizontal: spacing.lg, gap: spacing.sm, paddingVertical: spacing.xs },
   chip: {
     flexDirection: 'row',

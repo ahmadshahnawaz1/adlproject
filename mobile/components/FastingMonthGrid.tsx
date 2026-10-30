@@ -11,9 +11,10 @@ import { CalendarCheck } from 'lucide-react-native';
 import { dayKey } from '../lib/fastingLog';
 import type { UseFastingLog } from '../hooks/useFastingLog';
 import type { FastingStatus } from '../content/fasting';
-import { colors, radius, spacing, typography } from '../theme/tokens';
+import { radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
-function cellColors(status: FastingStatus): { bg: string; border: string; text: string } {
+const makeCellColors = (colors: ThemeColors) => (status: FastingStatus): { bg: string; border: string; text: string } => {
   switch (status) {
     case 'fasted':
       return { bg: colors.primary, border: colors.primary, text: colors.primaryForeground };
@@ -24,7 +25,7 @@ function cellColors(status: FastingStatus): { bg: string; border: string; text: 
     default:
       return { bg: colors.cardElevated, border: colors.border, text: colors.subtleForeground };
   }
-}
+};
 
 const LEGEND: { status: FastingStatus; label: string }[] = [
   { status: 'fasted', label: 'Fasted' },
@@ -39,6 +40,9 @@ export default function FastingMonthGrid({
   dates: Date[];
   fastingLog: UseFastingLog;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
+  const cellColors = makeCellColors(colors);
   const today = dayKey();
   const tally = fastingLog.tally(dates);
 
@@ -95,7 +99,7 @@ export default function FastingMonthGrid({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     padding: spacing.lg,
     borderRadius: radius.lg,

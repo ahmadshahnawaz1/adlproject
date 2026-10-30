@@ -7,7 +7,7 @@
  * to storage. v1 settings are migrated forward on first load.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import { DEFAULT_TRANSLATION_ID, DEFAULT_TAFSIR_ID } from '../content/quran';
 import {
   DEFAULT_READER_THEME,
@@ -35,6 +35,8 @@ export type QuranSettings = {
   showTransliteration: boolean;
   showTranslation: boolean;
   showWordByWord: boolean;
+  /** Colour the Arabic by its recitation rules. */
+  showTajweed: boolean;
   /** Selected translation editions, stacked in order. May be empty. */
   translationIds: string[];
   readerTheme: ReaderThemeKey;
@@ -49,6 +51,7 @@ export const DEFAULT_SETTINGS: QuranSettings = {
   showTransliteration: false,
   showTranslation: true,
   showWordByWord: false,
+  showTajweed: false,
   translationIds: [DEFAULT_TRANSLATION_ID],
   readerTheme: DEFAULT_READER_THEME,
   tafsirId: DEFAULT_TAFSIR_ID,
@@ -85,6 +88,9 @@ function sanitize(raw: unknown): Partial<QuranSettings> {
   if (typeof v.showWordByWord === 'boolean') {
     out.showWordByWord = v.showWordByWord;
   }
+  if (typeof v.showTajweed === 'boolean') {
+    out.showTajweed = v.showTajweed;
+  }
   if (Array.isArray(v.translationIds)) {
     const ids = v.translationIds.filter(
       (x): x is string => typeof x === 'string',
@@ -114,6 +120,7 @@ export type UseQuranSettings = {
   toggleTransliteration: () => void;
   toggleTranslation: () => void;
   toggleWordByWord: () => void;
+  toggleTajweed: () => void;
   toggleTranslationId: (id: string) => void;
   setReaderTheme: (key: ReaderThemeKey) => void;
   setTafsirId: (id: string) => void;
@@ -237,6 +244,11 @@ export default function useQuranSettings(): UseQuranSettings {
     [persist],
   );
 
+  const toggleTajweed = useCallback(
+    () => persist((prev) => ({ ...prev, showTajweed: !prev.showTajweed })),
+    [persist],
+  );
+
   const setReaderTheme = useCallback(
     (readerTheme: ReaderThemeKey) =>
       persist((prev) => ({ ...prev, readerTheme })),
@@ -288,6 +300,7 @@ export default function useQuranSettings(): UseQuranSettings {
       toggleTransliteration,
       toggleTranslation,
       toggleWordByWord,
+      toggleTajweed,
       toggleTranslationId,
       setReaderTheme,
       setTafsirId,
@@ -306,6 +319,7 @@ export default function useQuranSettings(): UseQuranSettings {
       toggleTransliteration,
       toggleTranslation,
       toggleWordByWord,
+      toggleTajweed,
       toggleTranslationId,
       setReaderTheme,
       setTafsirId,

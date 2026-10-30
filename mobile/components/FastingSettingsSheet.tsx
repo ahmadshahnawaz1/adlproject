@@ -18,7 +18,8 @@ import {
 } from '../hooks/useFastingPrefs';
 import { ensurePermissions } from '../lib/notifications';
 import { configureFastingNotifications, sendTestFastingNotification } from '../lib/fastingNotifications';
-import { colors, radius, spacing, typography } from '../theme/tokens';
+import { radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const PREVIEW_DAYS = [1, 10, 15, 21, 27];
 
@@ -50,6 +51,8 @@ export default function FastingSettingsSheet({
   onSetReminder: (key: keyof FastingReminderToggles, value: boolean) => void;
   onReset: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [testMsg, setTestMsg] = useState<string | null>(null);
 
   async function handleRemindersOn(v: boolean) {
@@ -242,6 +245,7 @@ export default function FastingSettingsSheet({
 }
 
 function Seg({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.segBtn, selected && styles.segBtnActive, pressed && styles.pressed]}>
       <Text style={[styles.segText, selected && styles.segTextActive]}>{label}</Text>
@@ -249,8 +253,8 @@ function Seg({ label, selected, onPress }: { label: string; selected: boolean; o
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheet: {
     position: 'absolute',
     left: 0,

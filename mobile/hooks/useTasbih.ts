@@ -9,7 +9,7 @@
  * success when a full round closes.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import * as Haptics from 'expo-haptics';
 import {
   DEFAULT_PRESET_ID,

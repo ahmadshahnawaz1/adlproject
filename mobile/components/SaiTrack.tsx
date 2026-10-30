@@ -9,7 +9,8 @@
 import { useEffect, useRef } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Line, Path, Rect, Text as SvgText } from 'react-native-svg';
-import { colors, fontFamily, spacing, typography } from '../theme/tokens';
+import { fontFamily, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -30,6 +31,8 @@ export default function SaiTrack({
   width?: number;
   caption?: string;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const complete = count >= total;
   const atMarwah = count % 2 === 1; // trip 1 ends at Marwah
   const target = atMarwah ? 1 : 0;
@@ -84,7 +87,7 @@ export default function SaiTrack({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.92 },
   pipRow: { flexDirection: 'row', gap: 6, marginTop: spacing.sm },

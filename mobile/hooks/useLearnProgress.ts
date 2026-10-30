@@ -7,7 +7,7 @@
  * lives in lib/learn; this hook only stores the sets and persists them.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import {
   NEW_MUSLIM_TRACK,
   trackProgress as computeTrackProgress,

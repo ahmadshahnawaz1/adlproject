@@ -2,11 +2,11 @@
  * LearnScreen — the Learning Hub.
  *
  * The home of the app's teaching content: a board of four sections — the New
- * Muslim path, the Sīrah timeline, ʿAqīdah, and Fiqh — plus a forgiving search
- * across every lesson and event. Opening the path or the Sīrah hands off to
- * their dedicated screens; ʿAqīdah and Fiqh open inline as grouped lesson
- * lists, each lesson read in a sheet. Reading progress is remembered between
- * visits. Fully offline, evidence-cited.
+ * Muslim path, the Sīrah, ʿAqīdah, and Fiqh — plus a forgiving search across
+ * every lesson. Opening the path hands off to its dedicated screen and the
+ * Sīrah opens the graded journey; ʿAqīdah and Fiqh open inline as grouped
+ * lesson lists, each lesson read in a sheet. Reading progress is remembered
+ * between visits. Fully offline, evidence-cited.
  */
 import { useMemo, useState } from 'react';
 import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -15,27 +15,22 @@ import DuaSearchBar from '../components/DuaSearchBar';
 import TopicGrid from '../components/learn/TopicGrid';
 import LearnCard from '../components/learn/LearnCard';
 import LessonSheet from '../components/learn/LessonSheet';
-import SirahScreen from './SirahScreen';
 import LearnPathScreen from './LearnPathScreen';
 import useLearnProgress from '../hooks/useLearnProgress';
 import {
   LEARN_TOPICS,
   LEARN_DISCLAIMER,
   NEW_MUSLIM_TRACK,
-  SIRAH_EVENTS,
   topicById,
   lessonsInTopic,
   type Lesson,
   type LearnTopicId,
-  type SirahEvent,
 } from '../content/learn';
-import { groupedLessons, searchLessons, searchSirah } from '../lib/learn';
+import { groupedLessons, searchLessons } from '../lib/learn';
 import { arabicFont, fontFamily, radius, spacing, typography } from '../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
-type Sheet =
-  | { kind: 'lesson'; lesson: Lesson }
-  | { kind: 'sirah'; event: SirahEvent };
+type Sheet = { kind: 'lesson'; lesson: Lesson };
 
 export default function LearnScreen({
   onNavigate,
@@ -55,18 +50,8 @@ export default function LearnScreen({
 
   const trimmed = query.trim();
   const lessonHits = useMemo(() => (trimmed ? searchLessons(trimmed) : []), [trimmed]);
-  const sirahHits = useMemo(() => (trimmed ? searchSirah(trimmed) : []), [trimmed]);
 
-  // The Sīrah and New-Muslim path are full, dedicated screens.
-  if (topicId === 'sirah') {
-    return (
-      <SirahScreen
-        isRead={progress.isLessonComplete}
-        onToggleRead={progress.setLessonComplete}
-        onClose={() => setTopicId(null)}
-      />
-    );
-  }
+  // The New-Muslim path is a full, dedicated screen.
   if (topicId === 'new-muslim') {
     return (
       <LearnPathScreen
@@ -87,8 +72,7 @@ export default function LearnScreen({
       return `${done} / ${NEW_MUSLIM_TRACK.steps.length} steps`;
     }
     if (id === 'sirah') {
-      const read = SIRAH_EVENTS.filter((e) => progress.isLessonComplete(e.id)).length;
-      return `${read} / ${SIRAH_EVENTS.length} events`;
+      return 'Graded timeline';
     }
     const lessons = lessonsInTopic(id);
     const read = lessons.filter((l) => progress.isLessonComplete(l.id)).length;
@@ -122,14 +106,14 @@ export default function LearnScreen({
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         {/* Search (hub level only) */}
         {!topic ? (
-          <DuaSearchBar value={query} onChangeText={setQuery} placeholder="Search lessons & the Sīrah…" />
+          <DuaSearchBar value={query} onChangeText={setQuery} placeholder="Search lessons…" />
         ) : null}
 
         {/* Search results */}
         {!topic && trimmed ? (
           <View style={styles.results}>
-            {lessonHits.length === 0 && sirahHits.length === 0 ? (
-              <Text style={styles.empty}>No lessons or events match “{trimmed}”.</Text>
+            {lessonHits.length === 0 ? (
+              <Text style={styles.empty}>No lessons match “{trimmed}”.</Text>
             ) : null}
             {lessonHits.length > 0 ? (
               <Text style={styles.resultsLabel}>Lessons</Text>
@@ -142,31 +126,17 @@ export default function LearnScreen({
                 onPress={() => setSheet({ kind: 'lesson', lesson })}
               />
             ))}
-            {sirahHits.length > 0 ? (
-              <Text style={styles.resultsLabel}>The Sīrah</Text>
-            ) : null}
-            {sirahHits.map((event) => (
-              <Pressable
-                key={event.id}
-                onPress={() => setSheet({ kind: 'sirah', event })}
-                style={({ pressed }) => [styles.sirahRow, pressed && styles.pressed]}
-              >
-                <Text style={styles.sirahYear}>{event.year}</Text>
-                <Text style={styles.sirahTitle} numberOfLines={1}>
-                  {event.title}
-                </Text>
-                <Text style={styles.sirahSummary} numberOfLines={2}>
-                  {event.summary}
-                </Text>
-              </Pressable>
-            ))}
           </View>
         ) : null}
 
         {/* Topic grid (hub) */}
         {!topic && !trimmed ? (
           <View style={styles.gridWrap}>
-            <TopicGrid topics={LEARN_TOPICS} hint={hint} onSelect={setTopicId} />
+            <TopicGrid
+              topics={LEARN_TOPICS}
+              hint={hint}
+              onSelect={(id) => (id === 'sirah' ? onNavigate?.('sirah') : setTopicId(id))}
+            />
             <Text style={styles.disclaimer}>{LEARN_DISCLAIMER}</Text>
           </View>
         ) : null}
@@ -197,28 +167,18 @@ export default function LearnScreen({
         ) : null}
       </ScrollView>
 
-      {/* Lesson / event reader */}
+      {/* Lesson reader */}
       <LessonSheet
         visible={sheet != null}
         onClose={() => setSheet(null)}
-        title={sheet ? (sheet.kind === 'lesson' ? sheet.lesson.title : sheet.event.title) : ''}
-        arabic={sheet ? (sheet.kind === 'lesson' ? sheet.lesson.arabic : sheet.event.arabic) : undefined}
-        meta={
-          sheet
-            ? sheet.kind === 'lesson'
-              ? `${sheet.lesson.group} · ${sheet.lesson.minutes} min`
-              : `${sheet.event.year} · ${sheet.event.place}`
-            : undefined
-        }
-        body={sheet ? (sheet.kind === 'lesson' ? sheet.lesson.body : sheet.event.body) : []}
-        complete={
-          sheet
-            ? progress.isLessonComplete(sheet.kind === 'lesson' ? sheet.lesson.id : sheet.event.id)
-            : false
-        }
+        title={sheet ? sheet.lesson.title : ''}
+        arabic={sheet ? sheet.lesson.arabic : undefined}
+        meta={sheet ? `${sheet.lesson.group} · ${sheet.lesson.minutes} min` : undefined}
+        body={sheet ? sheet.lesson.body : []}
+        complete={sheet ? progress.isLessonComplete(sheet.lesson.id) : false}
         onToggleComplete={(c) => {
           if (!sheet) return;
-          progress.setLessonComplete(sheet.kind === 'lesson' ? sheet.lesson.id : sheet.event.id, c);
+          progress.setLessonComplete(sheet.lesson.id, c);
         }}
       />
 
@@ -313,7 +273,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   groupList: { gap: spacing.sm },
 
   infoRoot: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   infoSheet: {
     backgroundColor: colors.background,
     borderTopLeftRadius: radius.xl,

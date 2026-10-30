@@ -9,7 +9,8 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import type { Journey, PilgrimageKind } from '../content/pilgrimage';
 import { JOURNEYS } from '../content/pilgrimage';
 import { journeyStepCount } from '../lib/pilgrimage';
-import { colors, fontFamily, radius, spacing, typography, arabicFont } from '../theme/tokens';
+import { fontFamily, radius, spacing, typography, arabicFont } from '../theme/tokens';
+import { useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import KaabaScene from './KaabaScene';
 import { useTilt } from './ParallaxScene';
 
@@ -20,6 +21,7 @@ function rukn(journey: Journey): number {
 }
 
 function JourneyCard({ journey, tiltEnabled, onPick }: { journey: Journey; tiltEnabled: boolean; onPick: () => void }) {
+  const styles = useThemedStyles(makeStyles);
   const tilt = useTilt(tiltEnabled);
   const stages = journey.stages.length;
   const steps = journeyStepCount(journey);
@@ -56,6 +58,7 @@ function JourneyCard({ journey, tiltEnabled, onPick }: { journey: Journey; tiltE
 }
 
 function Meta({ value, label }: { value: string; label: string }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.meta}>
       <Text style={styles.metaValue}>{value}</Text>
@@ -71,6 +74,7 @@ export default function JourneySelect({
   tiltEnabled?: boolean;
   onSelect: (kind: PilgrimageKind) => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
   const journeys = useMemo(() => JOURNEYS, []);
   return (
     <ScrollView contentContainerStyle={styles.scroll} showsVerticalScrollIndicator={false}>
@@ -85,7 +89,7 @@ export default function JourneySelect({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   scroll: { padding: spacing.lg, paddingBottom: spacing['3xl'], gap: spacing.lg },
   kicker: { fontFamily, fontSize: typography.label.fontSize, fontWeight: '600', color: colors.primary, letterSpacing: 0.5, textTransform: 'uppercase' },
   lede: { fontFamily, fontSize: typography.body.fontSize, lineHeight: 22, color: colors.mutedForeground, marginTop: -spacing.sm },

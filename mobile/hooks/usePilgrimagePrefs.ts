@@ -9,7 +9,7 @@
  * whole hub can be seen off-season.
  */
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import type { Gender, Madhhab } from '../content/pilgrimage';
 
 const PREFS_KEY = 'adl.pilgrimagePrefs.v1';

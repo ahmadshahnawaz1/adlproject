@@ -8,7 +8,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import * as Haptics from 'expo-haptics';
 import type { HajjType } from '../content/pilgrimage';
-import { arabicFont, colors, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { arabicFont, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import DaleelBlock from './DaleelBlock';
 
 type Option = {
@@ -59,6 +60,7 @@ export default function HajjTypeCard({
   haptics?: boolean;
   onSelect: (type: HajjType) => void;
 }) {
+  const styles = useThemedStyles(makeStyles);
   const pick = (t: HajjType) => {
     if (haptics) Haptics.selectionAsync().catch(() => {});
     onSelect(t);
@@ -113,7 +115,7 @@ export default function HajjTypeCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { gap: spacing.md },
   kicker: { fontFamily, fontSize: typography.label.fontSize, fontWeight: '700', color: colors.primary, textTransform: 'uppercase', letterSpacing: 0.5 },
   lede: { fontFamily, fontSize: typography.caption.fontSize, lineHeight: 20, color: colors.mutedForeground },

@@ -8,7 +8,7 @@
  * lib/dhikrGoals — this hook simply stores the numbers and persists them.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import {
   clampTasbihTarget,
   dayRecord,

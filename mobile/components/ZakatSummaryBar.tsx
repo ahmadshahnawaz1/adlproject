@@ -6,7 +6,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { ArrowRight } from 'lucide-react-native';
 import { formatMoney } from '../lib/zakat';
-import { colors, radius, spacing, typography } from '../theme/tokens';
+import { radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 export default function ZakatSummaryBar({
   netZakatable,
@@ -23,6 +24,8 @@ export default function ZakatSummaryBar({
   ctaLabel?: string;
   onPress?: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.bar}>
       <View style={styles.figures}>
@@ -48,7 +51,7 @@ export default function ZakatSummaryBar({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   bar: {
     flexDirection: 'row',
     alignItems: 'center',

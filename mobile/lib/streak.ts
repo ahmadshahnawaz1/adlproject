@@ -7,11 +7,10 @@
  * tests keep passing. New features build on this single, well-tested core.
  * No React, no storage, no side effects — dates and predicates in, numbers out.
  */
+import { dayKey } from './clock';
 
-/** Local 'YYYY-MM-DD' key for a date (device-local, en-CA = ISO order). */
-export function dayKey(date: Date = new Date()): string {
-  return date.toLocaleDateString('en-CA');
-}
+// dayKey is centralized in lib/clock; re-exported for existing importers.
+export { dayKey };
 
 /** Whether `key` is the calendar day immediately after `prevKey`. */
 export function isConsecutiveDay(prevKey: string, key: string): boolean {

@@ -11,7 +11,7 @@
  * in is a single tap to a beautiful experience.
  */
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import type { PrayerName } from '../lib/prayerTimes';
 import {
   DEFAULT_VOICE_ID,

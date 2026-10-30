@@ -85,13 +85,8 @@ export function matchesQuery(dua: Dua, query: string): boolean {
   return scoreDua(dua, tokens) > 0;
 }
 
-/**
- * Search the library. An empty query returns the whole pool (in catalogue
- * order). A category id narrows the pool first. Results are ranked by relevance,
- * with catalogue order preserved among equal scores.
- */
-export function searchDuas(query: string, categoryId?: DuaCategoryId): Dua[] {
-  const pool = categoryId ? duasInCategory(categoryId) : ALL_DUAS;
+/** Rank a supplied pool by relevance, preserving catalogue order among ties. */
+export function searchIn(pool: readonly Dua[], query: string): Dua[] {
   const tokens = queryTokens(query);
   if (tokens.length === 0) return [...pool];
 
@@ -100,6 +95,15 @@ export function searchDuas(query: string, categoryId?: DuaCategoryId): Dua[] {
     .filter((entry) => entry.score > 0)
     .sort((a, b) => b.score - a.score || a.index - b.index)
     .map((entry) => entry.dua);
+}
+
+/**
+ * Search the library. An empty query returns the whole pool (in catalogue
+ * order). A category id narrows the pool first. Results are ranked by relevance,
+ * with catalogue order preserved among equal scores.
+ */
+export function searchDuas(query: string, categoryId?: DuaCategoryId): Dua[] {
+  return searchIn(categoryId ? duasInCategory(categoryId) : ALL_DUAS, query);
 }
 
 /** How many supplications a category holds. */

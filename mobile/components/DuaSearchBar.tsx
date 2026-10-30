@@ -5,7 +5,8 @@
  */
 import { Pressable, StyleSheet, TextInput, View } from 'react-native';
 import { Search, X } from 'lucide-react-native';
-import { colors, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 export default function DuaSearchBar({
   value,
@@ -16,6 +17,8 @@ export default function DuaSearchBar({
   onChangeText: (text: string) => void;
   placeholder?: string;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.wrap}>
       <Search size={18} color={colors.subtleForeground} strokeWidth={2} />
@@ -39,7 +42,7 @@ export default function DuaSearchBar({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: {
     flexDirection: 'row',
     alignItems: 'center',

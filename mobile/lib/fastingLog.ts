@@ -6,7 +6,8 @@
  * Pure logic + AsyncStorage — no UI, no network. Mirrors prayerLog so the two
  * trackers behave identically.
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from './scopedStorage';
+import { dayKey } from './clock';
 import type { ExemptReason, FastingStatus } from '../content/fasting/fasting';
 
 export const FASTING_LOG_KEY = 'adl.fastingLog.v1';
@@ -35,10 +36,8 @@ export function nextFastStatus(s: FastingStatus | undefined): FastingStatus {
   return CYCLE[(i + 1) % CYCLE.length];
 }
 
-/** Local 'YYYY-MM-DD' key for a date (device-local, en-CA = ISO order). */
-export function dayKey(date: Date = new Date()): string {
-  return date.toLocaleDateString('en-CA');
-}
+// dayKey is centralized in lib/clock; re-exported for existing importers.
+export { dayKey };
 
 /** Read the full log from storage (empty object on first run / error). */
 export async function loadFastingLog(): Promise<FastingLog> {

@@ -11,7 +11,7 @@
  * is the running sum, so the user can always look back and see exactly how the
  * debt grew and shrank. Pure logic + AsyncStorage — no UI, no network.
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from './scopedStorage';
 import { OBLIGATORY, type ObligatoryName } from './prayerLog';
 
 export const QAZA_KEY = 'adl.qazaLedger.v1';

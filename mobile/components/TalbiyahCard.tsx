@@ -8,10 +8,12 @@
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import { TALBIYAH } from '../content/pilgrimage';
 import useBreathing from '../hooks/useBreathing';
-import { arabicFont, colors, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { arabicFont, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import DaleelBlock from './DaleelBlock';
 
 export default function TalbiyahCard({ showArabic = true }: { showArabic?: boolean }) {
+  const styles = useThemedStyles(makeStyles);
   const { opacity } = useBreathing({ min: 0.25, max: 0.7, duration: 2000 });
 
   return (
@@ -41,7 +43,7 @@ export default function TalbiyahCard({ showArabic = true }: { showArabic?: boole
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: { backgroundColor: colors.card, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, gap: spacing.md },
   kicker: { fontFamily, fontSize: typography.label.fontSize, fontWeight: '600', color: colors.primary, letterSpacing: 0.3 },
   arabicWrap: { alignItems: 'center', justifyContent: 'center', paddingVertical: spacing.lg, position: 'relative' },

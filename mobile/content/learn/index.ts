@@ -1,25 +1,19 @@
 /**
  * content/learn — the barrel for the Learning Hub.
  *
- * Gathers the four sections (Sīrah, ʿAqīdah, Fiqh, and the New Muslim path),
- * exposes the topic tiles, the flattened collections, and small resolvers, and
- * carries the standing review disclaimer.
+ * Gathers the lesson sections (ʿAqīdah, Fiqh) and the New Muslim path, exposes
+ * the topic tiles, the flattened collections, and small resolvers, and carries
+ * the standing review disclaimer. The Sīrah has its own graded corpus in
+ * content/sirah; the Sīrah tile here opens that journey.
  */
 export * from './types';
 
-import type { Lesson, LearnTopic, SirahEvent, Track } from './types';
+import type { Lesson, LearnTopic, Track } from './types';
 import { AQIDAH_LESSONS } from './aqidah';
 import { FIQH_LESSONS } from './fiqh';
-import { SIRAH_MAKKAH } from './sirahMakkah';
-import { SIRAH_MADINAH } from './sirahMadinah';
 import { NEW_MUSLIM_TRACK } from './newmuslim';
 
-export { AQIDAH_LESSONS, FIQH_LESSONS, SIRAH_MAKKAH, SIRAH_MADINAH, NEW_MUSLIM_TRACK };
-
-/** The whole Sīrah timeline, ordered from the earliest event to the last. */
-export const SIRAH_EVENTS: SirahEvent[] = [...SIRAH_MAKKAH, ...SIRAH_MADINAH].sort(
-  (a, b) => a.order - b.order,
-);
+export { AQIDAH_LESSONS, FIQH_LESSONS, NEW_MUSLIM_TRACK };
 
 /** Every standalone lesson (ʿAqīdah + Fiqh), in catalogue order. */
 export const ALL_LESSONS: Lesson[] = [...AQIDAH_LESSONS, ...FIQH_LESSONS];
@@ -83,11 +77,6 @@ export function lessonById(id: string): Lesson | undefined {
 /** All lessons belonging to a topic (ʿAqīdah or Fiqh). */
 export function lessonsInTopic(topicId: string): Lesson[] {
   return ALL_LESSONS.filter((l) => l.topicId === topicId);
-}
-
-/** Resolve a Sīrah event by id. */
-export function sirahEventById(id: string): SirahEvent | undefined {
-  return SIRAH_EVENTS.find((e) => e.id === id);
 }
 
 /** A plain note that the content awaits scholarly review. */

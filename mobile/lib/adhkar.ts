@@ -10,22 +10,22 @@
  */
 import {
   ADHKAR_CATEGORIES,
+  ADHKAR_DISCLAIMER,
   DEFAULT_CATEGORY_ID,
   categoryById,
   type AdhkarCategory,
   type Dhikr,
 } from '../content/adhkar';
+import { dayKey } from './clock';
 
 /** Re-export the catalogue so screens can import everything from one place. */
-export { ADHKAR_CATEGORIES, categoryById, DEFAULT_CATEGORY_ID };
+export { ADHKAR_CATEGORIES, ADHKAR_DISCLAIMER, categoryById, DEFAULT_CATEGORY_ID };
 
 /** The live tap counts of one set, keyed by dhikr id. */
 export type DhikrCounts = Record<string, number>;
 
-/** Local 'YYYY-MM-DD' key for a date (device-local, en-CA = ISO order). */
-export function dayKey(date: Date = new Date()): string {
-  return date.toLocaleDateString('en-CA');
-}
+// dayKey is centralized in lib/clock; re-exported for existing importers.
+export { dayKey };
 
 /** The recorded count for one dhikr (0 if untouched). */
 export function dhikrCount(counts: DhikrCounts, id: string): number {

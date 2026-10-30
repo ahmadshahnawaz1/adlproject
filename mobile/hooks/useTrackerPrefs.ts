@@ -8,7 +8,7 @@
  * has to open settings — but everything is theirs to tune.
  */
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 
 const PREFS_KEY = 'adl.trackerPrefs.v1';
 

@@ -20,14 +20,21 @@ import {
   Moon,
   BookOpen,
   BookOpenText,
+  BookText,
   BookMarked,
   Target,
   GraduationCap,
+  MapPinned,
+  Bot,
+  Footprints,
+  Gem,
+  MoonStar,
   ChevronRight,
 } from 'lucide-react-native';
 import { Mosque } from 'phosphor-react-native';
 import useBreathing from '../hooks/useBreathing';
 import useResolvedSettings from '../hooks/useResolvedSettings';
+import useFormattedTime from '../hooks/useFormattedTime';
 import usePrayerLog from '../hooks/usePrayerLog';
 import useFastingPrefs from '../hooks/useFastingPrefs';
 import { getNextPrayer, getQiblaDirection, getPrayerTimes } from '../lib/prayerTimes';
@@ -44,6 +51,7 @@ import { getDevotionalWindows, activeForbiddenWindow } from '../lib/devotionalTi
 import { OBLIGATORY } from '../lib/prayerLog';
 import { radius, spacing, typography } from '../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
+import { useT } from '../i18n/LocaleContext';
 import KaabaGlyph from '../components/KaabaGlyph';
 import TasbihGlyph from '../components/TasbihGlyph';
 import MihrabGlyph from '../components/MihrabGlyph';
@@ -57,15 +65,6 @@ const PRAYER_LABEL: Record<string, string> = {
   maghrib: 'Maghrib',
   isha: 'Isha',
 };
-
-function formatTime(date: Date, timeZone: string): string {
-  return date.toLocaleTimeString('en-US', {
-    timeZone,
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
-}
 
 function formatCountdown(ms: number): string {
   if (ms < 0) ms = 0;
@@ -102,8 +101,10 @@ export default function HomeScreen({
 }) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const t = useT();
   const { opacity: glow } = useBreathing();
   const { location, timeZone, settings } = useResolvedSettings();
+  const formatTime = useFormattedTime();
   const { day, stats } = usePrayerLog();
   const { prefs: fastingPrefs } = useFastingPrefs();
   const [now, setNow] = useState(() => new Date());
@@ -193,6 +194,8 @@ export default function HomeScreen({
         {/* Next prayer hero */}
         <Pressable
           onPress={() => onNavigate?.('prayer')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.heroWrap, pressed && styles.pressed]}
         >
           <View style={styles.hero}>
@@ -206,17 +209,106 @@ export default function HomeScreen({
           </View>
         </Pressable>
 
+        {/* Ask ADL AI — the Islamic AI companion (flagship) */}
+        <Pressable
+          onPress={() => onNavigate?.('ai')}
+          accessible
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
+        >
+          <View style={styles.wuduIcon}>
+            <Bot size={20} color={colors.primary} strokeWidth={2} />
+          </View>
+          <View style={styles.wideText}>
+            <Text style={styles.wideTitle}>{t('home.ai.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.ai.sub')}</Text>
+          </View>
+          <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
+        </Pressable>
+
+        {/* The Sīrah — the life of the Prophet ﷺ, authenticity-graded (flagship) */}
+        <Pressable
+          onPress={() => onNavigate?.('sirah')}
+          accessible
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
+        >
+          <View style={styles.wuduIcon}>
+            <Footprints size={20} color={colors.primary} strokeWidth={2} />
+          </View>
+          <View style={styles.wideText}>
+            <Text style={styles.wideTitle}>{t('home.sirah.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.sirah.sub')}</Text>
+          </View>
+          <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
+        </Pressable>
+
+        {/* Ramaḍān — surfaced only in season */}
+        {ramInfo.isRamadan ? (
+          <Pressable
+            onPress={() => onNavigate?.('ramadan')}
+            accessible
+            accessibilityRole="button"
+            style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
+          >
+            <View style={styles.wuduIcon}>
+              <MoonStar size={20} color={colors.primary} strokeWidth={2} />
+            </View>
+            <View style={styles.wideText}>
+              <Text style={styles.wideTitle}>Ramaḍān · day {ramInfo.day}</Text>
+              <Text style={styles.wideSub}>Tarāwīḥ, the last ten nights, and tonight’s worship</Text>
+            </View>
+            <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
+          </Pressable>
+        ) : null}
+
+        {/* The 99 Names — knowing Allah by His Beautiful Names */}
+        <Pressable
+          onPress={() => onNavigate?.('names')}
+          accessible
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
+        >
+          <View style={styles.wuduIcon}>
+            <Gem size={20} color={colors.primary} strokeWidth={2} />
+          </View>
+          <View style={styles.wideText}>
+            <Text style={styles.wideTitle}>{t('home.names.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.names.sub')}</Text>
+          </View>
+          <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
+        </Pressable>
+
         {/* Read the Qurʾān — the muṣḥaf, the flagship of the app */}
         <Pressable
           onPress={() => onNavigate?.('quran')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
             <BookMarked size={20} color={colors.primary} strokeWidth={2} />
           </View>
           <View style={styles.wideText}>
-            <Text style={styles.wideTitle}>Read the Qurʾān</Text>
-            <Text style={styles.wideSub}>The muṣḥaf — Arabic, meaning, offline</Text>
+            <Text style={styles.wideTitle}>{t('home.quran.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.quran.sub')}</Text>
+          </View>
+          <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
+        </Pressable>
+
+        {/* The Sunnah — the hadith library */}
+        <Pressable
+          onPress={() => onNavigate?.('hadith')}
+          accessible
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
+        >
+          <View style={styles.wuduIcon}>
+            <BookText size={20} color={colors.primary} strokeWidth={2} />
+          </View>
+          <View style={styles.wideText}>
+            <Text style={styles.wideTitle}>{t('home.hadith.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.hadith.sub')}</Text>
           </View>
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
@@ -224,14 +316,16 @@ export default function HomeScreen({
         {/* Pray — the guided ṣalāh, posture by posture */}
         <Pressable
           onPress={() => onNavigate?.('salah')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
             <MihrabGlyph size={20} color={colors.primary} accent={colors.primary} />
           </View>
           <View style={styles.wideText}>
-            <Text style={styles.wideTitle}>How to Pray</Text>
-            <Text style={styles.wideSub}>The ṣalāh, posture by posture</Text>
+            <Text style={styles.wideTitle}>{t('home.salah.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.salah.sub')}</Text>
           </View>
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
@@ -239,14 +333,16 @@ export default function HomeScreen({
         {/* Remember Allāh — the daily adhkār */}
         <Pressable
           onPress={() => onNavigate?.('adhkar')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
             <BookOpenText size={20} color={colors.primary} strokeWidth={2} />
           </View>
           <View style={styles.wideText}>
-            <Text style={styles.wideTitle}>Adhkār</Text>
-            <Text style={styles.wideSub}>Morning &amp; evening remembrance</Text>
+            <Text style={styles.wideTitle}>{t('home.adhkar.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.adhkar.sub')}</Text>
           </View>
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
@@ -254,14 +350,16 @@ export default function HomeScreen({
         {/* Dhikr goals — streaks for the daily remembrance */}
         <Pressable
           onPress={() => onNavigate?.('dhikr')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
             <Target size={20} color={colors.primary} strokeWidth={2} />
           </View>
           <View style={styles.wideText}>
-            <Text style={styles.wideTitle}>Dhikr Goals</Text>
-            <Text style={styles.wideSub}>Daily remembrance, streaks &amp; trend</Text>
+            <Text style={styles.wideTitle}>{t('home.dhikr.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.dhikr.sub')}</Text>
           </View>
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
@@ -269,14 +367,16 @@ export default function HomeScreen({
         {/* Learn — the Sīrah, belief & the fiqh of worship */}
         <Pressable
           onPress={() => onNavigate?.('learn')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
             <GraduationCap size={20} color={colors.primary} strokeWidth={2} />
           </View>
           <View style={styles.wideText}>
-            <Text style={styles.wideTitle}>Learn</Text>
-            <Text style={styles.wideSub}>New to Islam, the Sīrah, belief &amp; worship</Text>
+            <Text style={styles.wideTitle}>{t('home.learn.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.learn.sub')}</Text>
           </View>
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
@@ -289,14 +389,16 @@ export default function HomeScreen({
         {/* The duʿāʾ library — supplications for every moment */}
         <Pressable
           onPress={() => onNavigate?.('duas')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
             <BookOpen size={20} color={colors.primary} strokeWidth={2} />
           </View>
           <View style={styles.wideText}>
-            <Text style={styles.wideTitle}>Duʿāʾ</Text>
-            <Text style={styles.wideSub}>Supplications for every moment</Text>
+            <Text style={styles.wideTitle}>{t('home.duas.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.duas.sub')}</Text>
           </View>
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
@@ -304,14 +406,16 @@ export default function HomeScreen({
         {/* Prepare — wudū guide (the step before prayer) */}
         <Pressable
           onPress={() => onNavigate?.('wudu')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.wuduTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
             <Droplets size={20} color={colors.primary} strokeWidth={2} />
           </View>
           <View style={styles.wideText}>
-            <Text style={styles.wideTitle}>Prepare for prayer</Text>
-            <Text style={styles.wideSub}>Guided wudū — Qurʾān &amp; Sunnah</Text>
+            <Text style={styles.wideTitle}>{t('home.wudu.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.wudu.sub')}</Text>
           </View>
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
@@ -319,14 +423,16 @@ export default function HomeScreen({
         {/* Purify wealth — zakat calculator */}
         <Pressable
           onPress={() => onNavigate?.('zakat')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
             <Coins size={20} color={colors.primary} strokeWidth={2} />
           </View>
           <View style={styles.wideText}>
-            <Text style={styles.wideTitle}>Calculate your Zakat</Text>
-            <Text style={styles.wideSub}>Niṣāb, ḥawl &amp; evidence — fully offline</Text>
+            <Text style={styles.wideTitle}>{t('home.zakat.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.zakat.sub')}</Text>
           </View>
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
@@ -334,6 +440,8 @@ export default function HomeScreen({
         {/* Give — the ṣadaqah & zakat giving log */}
         <Pressable
           onPress={() => onNavigate?.('sadaqah')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
@@ -346,9 +454,28 @@ export default function HomeScreen({
           <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
         </Pressable>
 
+        {/* Find — nearby mosques & halal places */}
+        <Pressable
+          onPress={() => onNavigate?.('mosques')}
+          accessible
+          accessibilityRole="button"
+          style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
+        >
+          <View style={styles.wuduIcon}>
+            <MapPinned size={20} color={colors.primary} strokeWidth={2} />
+          </View>
+          <View style={styles.wideText}>
+            <Text style={styles.wideTitle}>{t('home.mosques.title')}</Text>
+            <Text style={styles.wideSub}>{t('home.mosques.sub')}</Text>
+          </View>
+          <ChevronRight size={18} color={colors.subtleForeground} strokeWidth={2} />
+        </Pressable>
+
         {/* Fast — Ramadan command centre or fasting companion */}
         <Pressable
           onPress={() => onNavigate?.('fasting')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
@@ -364,6 +491,8 @@ export default function HomeScreen({
         {/* Pilgrimage — the guided ʿUmrah & Ḥajj journey */}
         <Pressable
           onPress={() => onNavigate?.('pilgrimage')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
@@ -379,6 +508,8 @@ export default function HomeScreen({
         {/* Remember Allāh — the tasbīḥ counter */}
         <Pressable
           onPress={() => onNavigate?.('tasbih')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.zakatTile, pressed && styles.pressed]}
         >
           <View style={styles.wuduIcon}>
@@ -395,6 +526,9 @@ export default function HomeScreen({
         <View style={styles.gridRow}>
           <Pressable
             onPress={() => onNavigate?.('tracker')}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={`Prayers logged today, ${prayedToday} of 5`}
             style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
           >
             <View style={styles.tileHead}>
@@ -421,6 +555,9 @@ export default function HomeScreen({
 
           <Pressable
             onPress={() => onNavigate?.('tracker')}
+            accessible
+            accessibilityRole="button"
+            accessibilityLabel={`Current streak, ${stats.streak} days`}
             style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
           >
             <View style={styles.tileHead}>
@@ -441,6 +578,8 @@ export default function HomeScreen({
         <View style={styles.gridRow}>
           <Pressable
             onPress={() => onNavigate?.('qibla')}
+            accessible
+            accessibilityRole="button"
             style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
           >
             <View style={styles.tileHead}>
@@ -456,6 +595,8 @@ export default function HomeScreen({
 
           <Pressable
             onPress={() => onNavigate?.('sunnah')}
+            accessible
+            accessibilityRole="button"
             style={({ pressed }) => [styles.tile, pressed && styles.pressed]}
           >
             <View style={styles.tileHead}>
@@ -483,6 +624,8 @@ export default function HomeScreen({
         {/* Calendar */}
         <Pressable
           onPress={() => onNavigate?.('calendar')}
+          accessible
+          accessibilityRole="button"
           style={({ pressed }) => [styles.wideTile, pressed && styles.pressed]}
         >
           <View style={styles.wideIcon}>

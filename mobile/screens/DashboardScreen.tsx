@@ -19,13 +19,77 @@ import SalahGuideScreen from './SalahGuideScreen';
 import AdhkarScreen from './AdhkarScreen';
 import DuaLibraryScreen from './DuaLibraryScreen';
 import QuranScreen from './QuranScreen';
+import HadithScreen from './HadithScreen';
+import NamesScreen from './NamesScreen';
+import RamadanScreen from './RamadanScreen';
+import HifzScreen from './HifzScreen';
+import TravelScreen from './TravelScreen';
+import FaraidScreen from './FaraidScreen';
+import JumuahScreen from './JumuahScreen';
+import HalalScannerScreen from './HalalScannerScreen';
+import AIChatScreen from './AIChatScreen';
+import SirahJourneyScreen from './SirahJourneyScreen';
 import DhikrHubScreen from './DhikrHubScreen';
 import TahajjudScreen from './TahajjudScreen';
 import LearnScreen from './LearnScreen';
+import MosqueFinderScreen from './MosqueFinderScreen';
+import SettingsScreen from '../components/settings/SettingsScreen';
+import ErrorBoundary from '../components/ErrorBoundary';
+import ThemeSettingsSheet from '../components/ThemeSettingsSheet';
+import LanguageSheet from '../components/LanguageSheet';
 import useCharityLog from '../hooks/useCharityLog';
+import { NavigationProvider, useBackInterceptor, useNavigation } from '../contexts/NavigationContext';
+import type { OverlayKey } from '../lib/navigation';
 import { useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
-type View_ = 'home' | 'prayer' | 'qibla' | 'sunnah' | 'calendar' | 'tracker';
+/** Human labels for the error-boundary fallback copy. */
+const OVERLAY_LABELS: Record<OverlayKey, string> = {
+  wudu: 'Wuḍū',
+  zakat: 'Zakat',
+  sadaqah: 'Ṣadaqah',
+  fasting: 'Fasting',
+  pilgrimage: 'Ḥajj & ʿUmrah',
+  tasbih: 'Tasbīḥ',
+  salah: 'How to Pray',
+  adhkar: 'Adhkār',
+  duas: 'Duʿāʾ',
+  quran: 'Qurʾān',
+  hadith: 'Hadith',
+  names: 'The 99 Names',
+  ramadan: 'Ramaḍān',
+  hifz: 'Ḥifẓ',
+  travel: 'Travel',
+  faraid: 'Inheritance',
+  jumuah: 'Jumuʿah & Eid',
+  halal: 'Ingredients',
+  ai: 'ADL AI',
+  sirah: 'Sīrah',
+  dhikr: 'Dhikr',
+  tahajjud: 'Tahajjud',
+  learn: 'Learn',
+  mosques: 'Mosques',
+  settings: 'Settings',
+};
+
+/** A stacked feature screen, isolated so a crash here resets only this screen. */
+function Overlay({
+  label,
+  onClose,
+  children,
+}: {
+  label: string;
+  onClose: () => void;
+  children: React.ReactNode;
+}) {
+  const styles = useThemedStyles(makeStyles);
+  return (
+    <View style={styles.overlay}>
+      <ErrorBoundary label={label} onReset={onClose}>
+        {children}
+      </ErrorBoundary>
+    </View>
+  );
+}
 
 /**
  * DashboardScreen — the shell of Adl. A persistent header (with the always-
@@ -34,74 +98,130 @@ type View_ = 'home' | 'prayer' | 'qibla' | 'sunnah' | 'calendar' | 'tracker';
  * Swipe right to open the sidebar, swipe left to close it.
  */
 export default function DashboardScreen({ onSignOut }: { onSignOut?: () => void }) {
+  return (
+    <NavigationProvider>
+      <DashboardShell onSignOut={onSignOut} />
+    </NavigationProvider>
+  );
+}
+
+function DashboardShell({ onSignOut }: { onSignOut?: () => void }) {
   const styles = useThemedStyles(makeStyles);
+  const { tab, stack, modal, navigate, closeOverlay, closeModal, replaceOverlay } = useNavigation();
   const [menuOpen, setMenuOpen] = useState(false);
-  const [view, setView] = useState<View_>('home');
-  const [wuduOpen, setWuduOpen] = useState(false);
-  const [zakatOpen, setZakatOpen] = useState(false);
-  const [sadaqahOpen, setSadaqahOpen] = useState(false);
-  const [fastingOpen, setFastingOpen] = useState(false);
-  const [pilgrimageOpen, setPilgrimageOpen] = useState(false);
-  const [tasbihOpen, setTasbihOpen] = useState(false);
-  const [salahOpen, setSalahOpen] = useState(false);
-  const [adhkarOpen, setAdhkarOpen] = useState(false);
-  const [duasOpen, setDuasOpen] = useState(false);
-  const [quranOpen, setQuranOpen] = useState(false);
-  const [dhikrOpen, setDhikrOpen] = useState(false);
-  const [tahajjudOpen, setTahajjudOpen] = useState(false);
-  const [learnOpen, setLearnOpen] = useState(false);
   const charity = useCharityLog();
   const menuOpenRef = useRef(menuOpen);
   menuOpenRef.current = menuOpen;
 
-  const navigate = (key: string) => {
-    if (key === 'wudu') setWuduOpen(true);
-    else if (key === 'zakat') setZakatOpen(true);
-    else if (key === 'sadaqah') setSadaqahOpen(true);
-    else if (key === 'fasting') setFastingOpen(true);
-    else if (key === 'pilgrimage') setPilgrimageOpen(true);
-    else if (key === 'tasbih') setTasbihOpen(true);
-    else if (key === 'salah') setSalahOpen(true);
-    else if (key === 'adhkar') setAdhkarOpen(true);
-    else if (key === 'duas') setDuasOpen(true);
-    else if (key === 'quran') setQuranOpen(true);
-    else if (key === 'dhikr') setDhikrOpen(true);
-    else if (key === 'tahajjud') setTahajjudOpen(true);
-    else if (key === 'learn') setLearnOpen(true);
-    else if (key === 'home') setView('home');
-    else setView(key as View_);
-  };
+  // An open drawer swallows the back gesture before it pops a route.
+  useBackInterceptor(menuOpen, () => setMenuOpen(false));
+
+  const close = (key: OverlayKey) => closeOverlay(key);
 
   const panResponder = useRef(
     PanResponder.create({
       onMoveShouldSetPanResponder: (_, g) =>
         Math.abs(g.dx) > 14 && Math.abs(g.dx) > Math.abs(g.dy) * 1.5,
       onPanResponderRelease: (_, g) => {
-        if (g.dx > 40 && !menuOpenRef.current) setMenuOpen(true);
-        else if (g.dx < -40 && menuOpenRef.current) setMenuOpen(false);
+        // Swipe left opens the sidebar; swipe right closes it.
+        if (g.dx < -40 && !menuOpenRef.current) setMenuOpen(true);
+        else if (g.dx > 40 && menuOpenRef.current) setMenuOpen(false);
       },
     }),
   ).current;
 
+  const renderOverlay = (key: OverlayKey): React.ReactNode => {
+    switch (key) {
+      case 'wudu':
+        return <WuduScreen onClose={() => close('wudu')} />;
+      case 'fasting':
+        return (
+          <FastingScreen
+            onClose={() => close('fasting')}
+            onOpenZakat={() => navigate('zakat')}
+            onOpenQuran={() => navigate('quran')}
+          />
+        );
+      case 'zakat':
+        return (
+          <ZakatScreen
+            onClose={() => close('zakat')}
+            onOpenSadaqah={() => navigate('sadaqah')}
+            charity={charity}
+          />
+        );
+      case 'sadaqah':
+        return <SadaqahScreen charity={charity} onClose={() => close('sadaqah')} />;
+      case 'pilgrimage':
+        return <PilgrimageScreen onClose={() => close('pilgrimage')} />;
+      case 'tasbih':
+        return <TasbihScreen onClose={() => close('tasbih')} />;
+      case 'salah':
+        return <SalahGuideScreen onClose={() => close('salah')} />;
+      case 'adhkar':
+        return <AdhkarScreen onClose={() => close('adhkar')} />;
+      case 'duas':
+        return <DuaLibraryScreen onClose={() => close('duas')} />;
+      case 'quran':
+        return <QuranScreen onClose={() => close('quran')} />;
+      case 'hadith':
+        return <HadithScreen onClose={() => close('hadith')} />;
+      case 'names':
+        return <NamesScreen onNavigate={navigate} onClose={() => close('names')} />;
+      case 'ramadan':
+        return <RamadanScreen onNavigate={navigate} onClose={() => close('ramadan')} />;
+      case 'hifz':
+        return <HifzScreen onNavigate={navigate} onClose={() => close('hifz')} />;
+      case 'travel':
+        return <TravelScreen onClose={() => close('travel')} />;
+      case 'faraid':
+        return <FaraidScreen onClose={() => close('faraid')} />;
+      case 'jumuah':
+        return <JumuahScreen onClose={() => close('jumuah')} />;
+      case 'halal':
+        return <HalalScannerScreen onClose={() => close('halal')} />;
+      case 'ai':
+        return <AIChatScreen onNavigate={navigate} onClose={() => close('ai')} />;
+      case 'sirah':
+        return <SirahJourneyScreen onNavigate={navigate} onClose={() => close('sirah')} />;
+      case 'dhikr':
+        return (
+          <DhikrHubScreen
+            onClose={() => close('dhikr')}
+            onOpenTasbih={() => replaceOverlay('dhikr', 'tasbih')}
+            onOpenAdhkar={() => replaceOverlay('dhikr', 'adhkar')}
+          />
+        );
+      case 'tahajjud':
+        return <TahajjudScreen onClose={() => close('tahajjud')} />;
+      case 'learn':
+        return <LearnScreen onNavigate={navigate} onClose={() => close('learn')} />;
+      case 'mosques':
+        return <MosqueFinderScreen onClose={() => close('mosques')} />;
+      case 'settings':
+        return <SettingsScreen onClose={() => close('settings')} onNavigate={navigate} />;
+    }
+  };
+
   return (
-    <View style={styles.container}>
-      <View style={styles.fill} {...panResponder.panHandlers}>
+    <View style={styles.container} {...panResponder.panHandlers}>
+      <View style={styles.fill}>
         <AppHeader onMenu={() => setMenuOpen(true)} />
 
         <View style={styles.body}>
-          <SceneSwitcher sceneKey={view}>
-            {view === 'prayer' ? (
+          <SceneSwitcher sceneKey={tab}>
+            {tab === 'prayer' ? (
               <PrayerScreen />
-            ) : view === 'qibla' ? (
+            ) : tab === 'qibla' ? (
               <QiblaScreen />
-            ) : view === 'sunnah' ? (
+            ) : tab === 'sunnah' ? (
               <SunnahScreen
-                onOpenWudu={() => setWuduOpen(true)}
-                onOpenTahajjud={() => setTahajjudOpen(true)}
+                onOpenWudu={() => navigate('wudu')}
+                onOpenTahajjud={() => navigate('tahajjud')}
               />
-            ) : view === 'calendar' ? (
+            ) : tab === 'calendar' ? (
               <CalendarScreen />
-            ) : view === 'tracker' ? (
+            ) : tab === 'tracker' ? (
               <TrackerScreen />
             ) : (
               <HomeScreen onNavigate={navigate} />
@@ -110,118 +230,33 @@ export default function DashboardScreen({ onSignOut }: { onSignOut?: () => void 
         </View>
       </View>
 
+      {/* Stack order is z-order: the most recently opened screen sits on top. */}
+      {stack.map((key) => (
+        <Overlay key={key} label={OVERLAY_LABELS[key]} onClose={() => close(key)}>
+          {renderOverlay(key)}
+        </Overlay>
+      ))}
+
       <Sidebar
         open={menuOpen}
         onClose={() => setMenuOpen(false)}
-        onNavigate={navigate}
+        onNavigate={(key) => navigate(key)}
         onSignOut={onSignOut}
       />
 
-      {wuduOpen ? (
-        <View style={styles.overlay}>
-          <WuduScreen onClose={() => setWuduOpen(false)} />
-        </View>
-      ) : null}
+      <ThemeSettingsSheet visible={modal === 'appearance'} onClose={closeModal} />
 
-      {fastingOpen ? (
-        <View style={styles.overlay}>
-          <FastingScreen
-            onClose={() => setFastingOpen(false)}
-            onOpenZakat={() => setZakatOpen(true)}
-            onOpenQuran={() => setQuranOpen(true)}
-          />
-        </View>
-      ) : null}
-
-      {zakatOpen ? (
-        <View style={styles.overlay}>
-          <ZakatScreen
-            onClose={() => setZakatOpen(false)}
-            onOpenSadaqah={() => setSadaqahOpen(true)}
-            charity={charity}
-          />
-        </View>
-      ) : null}
-
-      {sadaqahOpen ? (
-        <View style={styles.overlay}>
-          <SadaqahScreen charity={charity} onClose={() => setSadaqahOpen(false)} />
-        </View>
-      ) : null}
-
-      {pilgrimageOpen ? (
-        <View style={styles.overlay}>
-          <PilgrimageScreen onClose={() => setPilgrimageOpen(false)} />
-        </View>
-      ) : null}
-
-      {tasbihOpen ? (
-        <View style={styles.overlay}>
-          <TasbihScreen onClose={() => setTasbihOpen(false)} />
-        </View>
-      ) : null}
-
-      {salahOpen ? (
-        <View style={styles.overlay}>
-          <SalahGuideScreen onClose={() => setSalahOpen(false)} />
-        </View>
-      ) : null}
-
-      {adhkarOpen ? (
-        <View style={styles.overlay}>
-          <AdhkarScreen onClose={() => setAdhkarOpen(false)} />
-        </View>
-      ) : null}
-
-      {duasOpen ? (
-        <View style={styles.overlay}>
-          <DuaLibraryScreen onClose={() => setDuasOpen(false)} />
-        </View>
-      ) : null}
-
-      {quranOpen ? (
-        <View style={styles.overlay}>
-          <QuranScreen onClose={() => setQuranOpen(false)} />
-        </View>
-      ) : null}
-
-      {dhikrOpen ? (
-        <View style={styles.overlay}>
-          <DhikrHubScreen
-            onClose={() => setDhikrOpen(false)}
-            onOpenTasbih={() => {
-              setDhikrOpen(false);
-              setTasbihOpen(true);
-            }}
-            onOpenAdhkar={() => {
-              setDhikrOpen(false);
-              setAdhkarOpen(true);
-            }}
-          />
-        </View>
-      ) : null}
-
-      {tahajjudOpen ? (
-        <View style={styles.overlay}>
-          <TahajjudScreen onClose={() => setTahajjudOpen(false)} />
-        </View>
-      ) : null}
-
-      {learnOpen ? (
-        <View style={styles.overlay}>
-          <LearnScreen onNavigate={navigate} onClose={() => setLearnOpen(false)} />
-        </View>
-      ) : null}
+      <LanguageSheet visible={modal === 'language'} onClose={closeModal} />
     </View>
   );
 }
 
 const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   container: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     backgroundColor: colors.background,
   },
   fill: { flex: 1 },
   body: { flex: 1 },
-  overlay: { ...StyleSheet.absoluteFillObject, backgroundColor: colors.background },
+  overlay: { ...StyleSheet.absoluteFill, backgroundColor: colors.background },
 });

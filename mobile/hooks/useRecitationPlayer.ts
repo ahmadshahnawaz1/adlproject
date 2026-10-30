@@ -11,7 +11,7 @@
  * therefore never pulled into Jest-tested code.
  */
 import { useCallback, useEffect, useRef, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import {
   setAudioModeAsync,
   useAudioPlayer,

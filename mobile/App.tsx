@@ -6,14 +6,21 @@ import SplashScreen from './screens/SplashScreen';
 import SignUpScreen from './screens/SignUpScreen';
 import SignInScreen from './screens/SignInScreen';
 import ForgotPasswordScreen from './screens/ForgotPasswordScreen';
+import RecoveryCodeScreen from './screens/RecoveryCodeScreen';
 import LegalScreen from './screens/LegalScreen';
 import DashboardScreen from './screens/DashboardScreen';
 import SceneSwitcher from './components/SceneSwitcher';
+import ErrorBoundary from './components/ErrorBoundary';
+import LockScreen from './components/LockScreen';
+import useAppLock from './hooks/useAppLock';
 import { TERMS } from './content/legal/terms';
 import { PRIVACY } from './content/legal/privacy';
 import { ThemeProvider, useTheme } from './theme/ThemeContext';
+import { LocaleProvider } from './i18n/LocaleContext';
+import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { SettingsProvider } from './contexts/SettingsContext';
 
-const SPLASH_DURATION = 5000; // a long, premium pause
+const SPLASH_DURATION = 2400;
 const BLINK_OUT = 180; // matches SceneSwitcher — fade fully out
 const BLINK_IN = 260; // then fade the next scene in
 
@@ -25,21 +32,32 @@ export default function App() {
   useFonts({
     AmiriQuran: require('./assets/fonts/AmiriQuran-Regular.ttf'),
     ScheherazadeNew: require('./assets/fonts/ScheherazadeNew-Regular.ttf'),
+    NotoNastaliqUrdu: require('./assets/fonts/NotoNastaliqUrdu-Regular.ttf'),
   });
 
   return (
     <ThemeProvider>
-      <AppShell />
+      <LocaleProvider>
+        <AuthProvider>
+          <SettingsProvider>
+            <AppShell />
+          </SettingsProvider>
+        </AuthProvider>
+      </LocaleProvider>
     </ThemeProvider>
   );
 }
 
 function AppShell() {
   const { colors, isDark } = useTheme();
+  const { status, signUp, signIn, signOut } = useAuth();
+  const authenticated = status === 'signedIn';
+  const appLock = useAppLock(authenticated);
   const [showSplash, setShowSplash] = useState(true);
   const [authView, setAuthView] = useState<'signup' | 'signin'>('signup');
   const [overlay, setOverlay] = useState<Overlay>(null);
-  const [authenticated, setAuthenticated] = useState(false);
+  /** Held only between account creation and the user acknowledging the code. */
+  const [recoveryCode, setRecoveryCode] = useState<string | null>(null);
   const splashOpacity = useRef(new Animated.Value(1)).current;
   const contentOpacity = useRef(new Animated.Value(0)).current;
 
@@ -63,9 +81,12 @@ function AppShell() {
     return () => clearTimeout(timer);
   }, [splashOpacity, contentOpacity]);
 
-  const sceneKey =
-    authenticated
-      ? 'dashboard'
+  const sceneKey = recoveryCode
+    ? 'recovery'
+    : authenticated
+      ? appLock.locked
+        ? 'lock'
+        : 'dashboard'
       : overlay === 'forgot'
         ? 'forgot'
         : overlay === 'terms'
@@ -75,8 +96,16 @@ function AppShell() {
             : authView;
 
   const renderScene = () => {
+    // Shown once, before the dashboard, so the code cannot be missed.
+    if (recoveryCode) {
+      return <RecoveryCodeScreen code={recoveryCode} onDone={() => setRecoveryCode(null)} />;
+    }
     if (authenticated) {
-      return <DashboardScreen onSignOut={() => setAuthenticated(false)} />;
+      return appLock.locked ? (
+        <LockScreen onUnlock={() => { void appLock.unlock(); }} />
+      ) : (
+        <DashboardScreen onSignOut={() => { void signOut(); }} />
+      );
     }
     if (overlay === 'forgot') {
       return <ForgotPasswordScreen onBack={() => setOverlay(null)} />;
@@ -93,7 +122,14 @@ function AppShell() {
           onSignIn={() => setAuthView('signin')}
           onTerms={() => setOverlay('terms')}
           onPrivacy={() => setOverlay('privacy')}
-          onAuthenticated={() => setAuthenticated(true)}
+          onSubmit={async (name, email, password) => {
+            const r = await signUp(name, email, password);
+            if (r.ok) {
+              if (r.recoveryCode) setRecoveryCode(r.recoveryCode);
+              return null;
+            }
+            return r.error ?? 'Could not create account';
+          }}
         />
       );
     }
@@ -101,7 +137,19 @@ function AppShell() {
       <SignInScreen
         onSignUp={() => setAuthView('signup')}
         onForgot={() => setOverlay('forgot')}
-        onAuthenticated={() => setAuthenticated(true)}
+        onApple={async () => {
+          // Simplified sign-in: use (or create) a local demo account.
+          const email = 'ahmad@adl.app';
+          const password = 'adl-demo-passphrase';
+          const signedIn = await signIn(email, password);
+          if (signedIn.ok) return null;
+          const created = await signUp('Ahmad Shahnawaz', email, password);
+          return created.ok ? null : (created.error ?? 'Could not sign in');
+        }}
+        onSubmit={async (email, password) => {
+          const r = await signIn(email, password);
+          return r.ok ? null : (r.error ?? 'Could not sign in');
+        }}
       />
     );
   };
@@ -109,7 +157,9 @@ function AppShell() {
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       <Animated.View style={[styles.fill, { opacity: contentOpacity }]}>
-        <SceneSwitcher sceneKey={sceneKey}>{renderScene()}</SceneSwitcher>
+        <ErrorBoundary>
+          <SceneSwitcher sceneKey={sceneKey}>{renderScene()}</SceneSwitcher>
+        </ErrorBoundary>
       </Animated.View>
 
       {showSplash ? (
@@ -125,5 +175,5 @@ function AppShell() {
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  fill: { ...StyleSheet.absoluteFillObject },
+  fill: { ...StyleSheet.absoluteFill },
 });

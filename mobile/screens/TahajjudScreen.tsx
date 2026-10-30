@@ -33,7 +33,7 @@ import {
   TAHAJJUD_VIRTUES,
 } from '../content/tahajjud';
 import { reminderTimeFor, type NightThirdKey } from '../lib/nightPrayer';
-import { formatTime } from '../lib/clock';
+import useFormattedTime from '../hooks/useFormattedTime';
 import { sendTestTahajjud } from '../lib/notifications';
 import {
   arabicFont,
@@ -64,7 +64,8 @@ export default function TahajjudScreen({ onClose }: { onClose?: () => void }) {
   const [reminderOpen, setReminderOpen] = useState(false);
 
   const tz = t.timeZone;
-  const fmt = useMemo(() => (date: Date) => formatTime(date, tz), [tz]);
+  const formatTime = useFormattedTime();
+  const fmt = useMemo(() => (date: Date) => formatTime(date, tz), [tz, formatTime]);
 
   const reminderAt = useMemo(
     () => reminderTimeFor(t.window, t.prefs.mode, t.prefs.beforeFajrMinutes),

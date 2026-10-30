@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Animated, Easing, StyleSheet } from 'react-native';
+import useReduceMotion from '../hooks/useReduceMotion';
 
 const OUT = 180; // gentle fade away, like the logo dimming
 const IN = 260; // soft fade back in
@@ -20,12 +21,21 @@ export default function SceneSwitcher({
     key: sceneKey,
     node: children,
   });
+  const displayedKey = useRef(sceneKey);
+  const latestScene = useRef({ key: sceneKey, node: children });
   const opacity = useRef(new Animated.Value(1)).current;
+  const reduceMotion = useReduceMotion();
 
   useEffect(() => {
-    if (sceneKey === shown.key) {
-      // Same scene, content may have updated — keep it fresh.
-      setShown({ key: sceneKey, node: children });
+    latestScene.current = { key: sceneKey, node: children };
+    if (sceneKey === displayedKey.current) setShown(latestScene.current);
+  }, [sceneKey, children]);
+
+  useEffect(() => {
+    if (reduceMotion || sceneKey === displayedKey.current) {
+      opacity.setValue(1);
+      displayedKey.current = sceneKey;
+      setShown(latestScene.current);
       return;
     }
 
@@ -34,8 +44,10 @@ export default function SceneSwitcher({
       duration: OUT,
       easing: Easing.inOut(Easing.ease),
       useNativeDriver: true,
-    }).start(() => {
-      setShown({ key: sceneKey, node: children });
+    }).start(({ finished }) => {
+      if (!finished) return;
+      displayedKey.current = sceneKey;
+      setShown(latestScene.current);
       Animated.timing(opacity, {
         toValue: 1,
         duration: IN,
@@ -43,8 +55,8 @@ export default function SceneSwitcher({
         useNativeDriver: true,
       }).start();
     });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sceneKey, children]);
+    return () => opacity.stopAnimation();
+  }, [sceneKey, reduceMotion, opacity]);
 
   return (
     <Animated.View style={[styles.fill, { opacity }]}>
@@ -54,5 +66,5 @@ export default function SceneSwitcher({
 }
 
 const styles = StyleSheet.create({
-  fill: { ...StyleSheet.absoluteFillObject },
+  fill: { ...StyleSheet.absoluteFill },
 });

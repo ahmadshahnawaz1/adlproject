@@ -7,8 +7,10 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { MoonStar, Sunrise, Sunset } from 'lucide-react-native';
 import { fastDurationMs, type FastPhase, type FastTimes } from '../lib/fasting';
-import { formatDuration, formatTime } from '../lib/clock';
-import { arabicFont, colors, radius, spacing, typography } from '../theme/tokens';
+import { formatDuration } from '../lib/clock';
+import useFormattedTime from '../hooks/useFormattedTime';
+import { arabicFont, radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 type Row = {
   key: string;
@@ -30,6 +32,9 @@ export default function FastingTimesCard({
   phase: FastPhase;
   showArabic?: boolean;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
+  const formatTime = useFormattedTime();
   const rows: Row[] = [
     {
       key: 'imsak',
@@ -87,7 +92,7 @@ export default function FastingTimesCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     paddingHorizontal: spacing.lg,
     paddingVertical: spacing.xs,

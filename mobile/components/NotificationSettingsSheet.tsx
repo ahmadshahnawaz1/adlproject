@@ -93,7 +93,7 @@ export default function NotificationSettingsSheet({
   const styles = useThemedStyles(makeStyles);
   const MODE_OPTIONS = makeModeOptions(colors);
   const [testState, setTestState] = useState<'idle' | 'sending' | 'sent' | 'blocked'>('idle');
-  const sentTimer = useRef<ReturnType<typeof setTimeout>>();
+  const sentTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   const handleTest = async () => {
     if (testState === 'sending') return;
@@ -340,7 +340,7 @@ export default function NotificationSettingsSheet({
 }
 
 const makeStyles = (colors: ThemeColors) => StyleSheet.create({
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheet: {
     position: 'absolute',
     left: 0,

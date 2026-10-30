@@ -10,7 +10,7 @@
  * owns the clock, the stored prefs and the notification scheduling.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import useResolvedSettings from './useResolvedSettings';
 import { getPrayerTimes, type LatLng, type PrayerSettings } from '../lib/prayerTimes';
 import {

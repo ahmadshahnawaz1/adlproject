@@ -7,7 +7,7 @@
  * on demand for a given `now` so the live screen stays accurate as time passes.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import { QURAN_TOTAL_PAGES, khatmPace, type KhatmPace } from '../lib/quranKhatm';
 
 const KHATM_KEY = 'adl.quranKhatm.v1';

@@ -13,7 +13,8 @@ import {
   DAYS_BEFORE_STEP,
   type ZakatReminderPrefs,
 } from '../../hooks/useZakatReminder';
-import { colors, fontFamily, radius, spacing, typography } from '../../theme/tokens';
+import { fontFamily, radius, spacing, typography } from '../../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../../theme/ThemeContext';
 
 function formatDate(iso: string | null): string | null {
   if (!iso) return null;
@@ -41,6 +42,8 @@ export default function ZakatDueReminderSheet({
   onSetDaysBefore: (days: number) => void;
   onTest?: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const hasHawl = Boolean(dueDateISO);
   const dueLabel = formatDate(dueDateISO);
   const fireLabel = formatDate(reminderDateISO);
@@ -155,9 +158,9 @@ export default function ZakatDueReminderSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheet: {
     maxHeight: '85%',
     backgroundColor: colors.card,

@@ -9,11 +9,13 @@ import { StyleSheet, Text, View } from 'react-native';
 import type { Dua as FastingDua } from '../content/fasting';
 import { DUA_ARAFAH } from '../content/pilgrimage';
 import { daysUntilArafah, dhulHijjahInfo } from '../lib/pilgrimageDates';
-import { colors, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import DaleelBlock from './DaleelBlock';
 import DuaCard from './DuaCard';
 
 export default function ArafahCard({ showArabic = true, now = new Date() }: { showArabic?: boolean; now?: Date }) {
+  const styles = useThemedStyles(makeStyles);
   const info = useMemo(() => dhulHijjahInfo(now), [now]);
   const until = useMemo(() => daysUntilArafah(now), [now]);
 
@@ -57,6 +59,7 @@ export default function ArafahCard({ showArabic = true, now = new Date() }: { sh
 }
 
 function Bullet({ text }: { text: string }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.bulletRow}>
       <Text style={styles.bulletMark}>•</Text>
@@ -65,7 +68,7 @@ function Bullet({ text }: { text: string }) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { gap: spacing.md },
   banner: { backgroundColor: colors.cardElevated, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, paddingVertical: spacing.sm, paddingHorizontal: spacing.md },
   bannerToday: { backgroundColor: 'rgba(255,214,10,0.12)', borderColor: colors.primary },

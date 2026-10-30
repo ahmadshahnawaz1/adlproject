@@ -15,10 +15,12 @@ import {
   MIQAT_BY_AIR,
 } from '../content/pilgrimage';
 import type { Gender } from '../content/pilgrimage';
-import { arabicFont, colors, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { arabicFont, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import DaleelBlock from './DaleelBlock';
 
 export default function IhramGuideCard({ gender = 'male' }: { gender?: Gender }) {
+  const styles = useThemedStyles(makeStyles);
   const [showAllProhibitions, setShowAllProhibitions] = useState(false);
 
   const prohibitions = useMemo(() => {
@@ -91,6 +93,7 @@ export default function IhramGuideCard({ gender = 'male' }: { gender?: Gender })
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
@@ -100,6 +103,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 }
 
 function Bullet({ text, tone = 'default' }: { text: string; tone?: 'default' | 'success' }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.bulletRow}>
       <Text style={[styles.bulletMark, tone === 'success' && styles.bulletMarkSuccess]}>{tone === 'success' ? '✓' : '•'}</Text>
@@ -108,7 +112,7 @@ function Bullet({ text, tone = 'default' }: { text: string; tone?: 'default' | '
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { gap: spacing.xl },
   section: { gap: spacing.sm },
   sectionTitle: { fontFamily, fontSize: typography.label.fontSize, fontWeight: '700', color: colors.primary, textTransform: 'uppercase', letterSpacing: 0.5 },

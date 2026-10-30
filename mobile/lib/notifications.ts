@@ -21,6 +21,7 @@ import { Platform } from 'react-native';
 import * as Notifications from 'expo-notifications';
 import { getPrayerTimes } from './prayerTimes';
 import type { LatLng, PrayerName, PrayerSettings } from './prayerTimes';
+import { isDuringQuietHours } from './quietHours';
 
 /** How a prayer should announce itself. */
 export type AlertMode = 'silent' | 'vibrate' | 'chime' | 'adhan';
@@ -208,6 +209,10 @@ export type ScheduleInput = {
   daysAhead?: number;
   /** Reference "now" — injectable for testing. */
   from?: Date;
+  /** IANA zone for evaluating the quiet-hours window. */
+  timeZone?: string;
+  /** During this window, alerts are delivered silently and reminders are skipped. */
+  quietHours?: { enabled: boolean; start: string; end: string };
 };
 
 /** Remove every adhan notification we previously scheduled. */
@@ -228,7 +233,7 @@ export async function cancelAllAdhan(): Promise<void> {
  */
 export async function scheduleAdhanNotifications(input: ScheduleInput): Promise<number> {
   if (!configured) await configureNotifications();
-  const { coords, settings, config, cityLabel, daysAhead = 3, from = new Date() } = input;
+  const { coords, settings, config, cityLabel, daysAhead = 3, from = new Date(), timeZone, quietHours } = input;
   await cancelAllAdhan();
 
   const voice = voiceById(config.voiceId);
@@ -246,10 +251,16 @@ export async function scheduleAdhanNotifications(input: ScheduleInput): Promise<
       const at = times[prayer];
       if (!(at instanceof Date) || Number.isNaN(at.getTime())) continue;
 
+      // During quiet hours the call still arrives, but silently.
+      const quiet =
+        quietHours?.enabled && timeZone
+          ? isDuringQuietHours(at, timeZone, quietHours.start, quietHours.end)
+          : false;
+
       // Main call, exactly on time.
       if (at.getTime() > from.getTime()) {
         await Notifications.scheduleNotificationAsync({
-          content: content(prayer, cityLabel, config.mode, voice),
+          content: content(prayer, cityLabel, quiet ? 'silent' : config.mode, voice),
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
             date: at,
@@ -258,8 +269,8 @@ export async function scheduleAdhanNotifications(input: ScheduleInput): Promise<
         count += 1;
       }
 
-      // Optional heads-up reminder before the call.
-      if (config.reminderMinutes > 0) {
+      // Optional heads-up reminder before the call (skipped during quiet hours).
+      if (!quiet && config.reminderMinutes > 0) {
         const remindAt = new Date(at.getTime() - config.reminderMinutes * 60_000);
         if (remindAt.getTime() > from.getTime()) {
           await Notifications.scheduleNotificationAsync({

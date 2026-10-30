@@ -11,13 +11,14 @@ import { BookOpenText, ChevronRight, Minus, Plus } from 'lucide-react-native';
 import type { KhatmStatus } from '../lib/quranKhatm';
 import { pageToJuz } from '../lib/quranKhatm';
 import type { UseQuranKhatm } from '../hooks/useQuranKhatm';
-import { colors, radius, spacing, typography } from '../theme/tokens';
+import { radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import Button from './ui/Button';
 
 const R = 42;
 const C = 2 * Math.PI * R;
 
-function statusMeta(status: KhatmStatus): { label: string; color: string } {
+function statusMeta(status: KhatmStatus, colors: ThemeColors): { label: string; color: string } {
   switch (status) {
     case 'done':
       return { label: 'Complete', color: colors.success };
@@ -40,6 +41,7 @@ function fmtDate(iso: string | null): string {
 }
 
 function Ring({ pct, color }: { pct: number; color: string }) {
+  const { colors } = useTheme();
   const dash = C * Math.max(0, Math.min(1, pct));
   return (
     <Svg width={120} height={120} viewBox="0 0 100 100">
@@ -60,6 +62,7 @@ function Ring({ pct, color }: { pct: number; color: string }) {
 }
 
 function Stat({ label, value }: { label: string; value: string }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.stat}>
       <Text style={styles.statValue}>{value}</Text>
@@ -77,6 +80,8 @@ export default function QuranKhatmCard({
   now: Date;
   onOpenReader?: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const { state } = khatm;
 
   const openLink = onOpenReader ? (
@@ -110,7 +115,7 @@ export default function QuranKhatmCard({
   }
 
   const pace = khatm.pace(now);
-  const meta = statusMeta(pace.status);
+  const meta = statusMeta(pace.status, colors);
   const juz = pageToJuz(state.currentPage);
   const finishISO = state.endISO || pace.projectedFinishISO;
 
@@ -194,7 +199,7 @@ export default function QuranKhatmCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     padding: spacing.lg,
     borderRadius: radius.lg,

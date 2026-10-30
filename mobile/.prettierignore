@@ -1,0 +1,9 @@
+node_modules/
+.expo/
+dist/
+coverage/
+assets/
+content/quran/data/
+content/quran/editions-catalog.ts
+package-lock.json
+.prettier-baseline.json

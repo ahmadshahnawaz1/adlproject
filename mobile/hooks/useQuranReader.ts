@@ -6,7 +6,7 @@
  * when `last` is set.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 
 const READER_KEY = 'adl.quran.reader.v1';
 

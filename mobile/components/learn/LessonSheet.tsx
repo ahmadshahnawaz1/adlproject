@@ -9,7 +9,8 @@ import { Modal, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { Check, X } from 'lucide-react-native';
 import type { LessonBlock } from '../../content/learn';
 import LessonView from './LessonView';
-import { arabicFont, colors, fontFamily, radius, spacing, typography } from '../../theme/tokens';
+import { arabicFont, fontFamily, radius, spacing, typography } from '../../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../../theme/ThemeContext';
 
 export default function LessonSheet({
   visible,
@@ -30,6 +31,8 @@ export default function LessonSheet({
   complete?: boolean;
   onToggleComplete?: (complete: boolean) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
       <View style={styles.root}>
@@ -72,9 +75,9 @@ export default function LessonSheet({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheet: {
     maxHeight: '85%',
     backgroundColor: colors.background,

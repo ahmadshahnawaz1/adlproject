@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import {
-  NativeSyntheticEvent,
   Pressable,
   StyleSheet,
-  Text,
-  TextInput,
-  TextInputFocusEventData,
+  type TextInput,
   TextInputProps,
   View,
 } from 'react-native';
+import Text from './AppText';
+import AppTextInput from './AppTextInput';
+import useA11ySettings from '../../hooks/useA11ySettings';
 import { Eye, EyeOff } from 'lucide-react-native';
 import { radius, spacing, typography } from '../../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../../theme/ThemeContext';
@@ -32,20 +32,22 @@ const Input = React.forwardRef<TextInput, Props>(function Input(
     isPassword = false,
     onFocus,
     onBlur,
+    style,
     ...props
   },
   ref,
 ) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const { minTouchSize } = useA11ySettings();
   const [focused, setFocused] = useState(false);
   const [hidden, setHidden] = useState(isPassword);
 
-  const handleFocus = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+  const handleFocus: NonNullable<TextInputProps['onFocus']> = (e) => {
     setFocused(true);
     onFocus?.(e);
   };
-  const handleBlur = (e: NativeSyntheticEvent<TextInputFocusEventData>) => {
+  const handleBlur: NonNullable<TextInputProps['onBlur']> = (e) => {
     setFocused(false);
     onBlur?.(e);
   };
@@ -61,9 +63,9 @@ const Input = React.forwardRef<TextInput, Props>(function Input(
       {label ? <Text style={styles.label}>{label}</Text> : null}
       <View style={[styles.field, { borderColor }, focused && styles.fieldFocused]}>
         {icon ? <View style={styles.leadingIcon}>{icon}</View> : null}
-        <TextInput
+        <AppTextInput
           ref={ref}
-          style={styles.input}
+          style={[styles.input, style]}
           placeholderTextColor={colors.subtleForeground}
           secureTextEntry={hidden}
           onFocus={handleFocus}
@@ -71,13 +73,13 @@ const Input = React.forwardRef<TextInput, Props>(function Input(
           autoCapitalize="none"
           autoCorrect={false}
           selectionColor={colors.primary}
+          accessibilityLabel={label}
           {...props}
         />
         {isPassword ? (
           <Pressable
             onPress={() => setHidden((h) => !h)}
-            hitSlop={10}
-            style={styles.trailingIcon}
+            style={[styles.trailingIcon, { minWidth: minTouchSize, minHeight: minTouchSize }]}
             accessibilityRole="button"
             accessibilityLabel={hidden ? 'Show password' : 'Hide password'}
           >
@@ -89,7 +91,7 @@ const Input = React.forwardRef<TextInput, Props>(function Input(
           </Pressable>
         ) : null}
       </View>
-      {error ? <Text style={styles.error}>{error}</Text> : null}
+      {error ? <Text style={styles.error} accessibilityLiveRegion="polite">{error}</Text> : null}
     </View>
   );
 });
@@ -106,7 +108,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   field: {
     flexDirection: 'row',
     alignItems: 'center',
-    height: 52,
+    minHeight: 52,
     borderWidth: 1,
     borderRadius: radius.md,
     backgroundColor: colors.input,
@@ -116,10 +118,12 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     backgroundColor: colors.cardElevated,
   },
   leadingIcon: { marginRight: spacing.sm },
-  trailingIcon: { paddingLeft: spacing.sm },
+  trailingIcon: { alignItems: 'center', justifyContent: 'center', marginEnd: -spacing.sm },
   input: {
     flex: 1,
-    height: '100%',
+    minWidth: 0,
+    minHeight: 52,
+    paddingVertical: spacing.md,
     color: colors.foreground,
     ...typography.body,
   },

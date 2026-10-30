@@ -10,7 +10,7 @@
  * Pure logic + AsyncStorage — no UI, no native modules. This is what the unit
  * tests exercise and what the cards render from.
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from './scopedStorage';
 
 import { formatMoney } from './zakat';
 

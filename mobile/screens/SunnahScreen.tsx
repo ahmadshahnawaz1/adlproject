@@ -16,15 +16,7 @@ import {
 } from '../lib/devotionalTimes';
 import { radius, spacing, typography, arabicFont } from '../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
-
-function formatTime(date: Date, timeZone: string): string {
-  return date.toLocaleTimeString('en-US', {
-    timeZone,
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
-}
+import useFormattedTime from '../hooks/useFormattedTime';
 
 function dayKeyInZone(date: Date, timeZone: string): string {
   return date.toLocaleDateString('en-CA', { timeZone });
@@ -49,6 +41,7 @@ function WindowCard({
 }) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const formatTime = useFormattedTime();
   const forbidden = w.kind === 'forbidden';
   const ms = now.getTime();
   const live = ms >= w.start.getTime() && ms < w.end.getTime();
@@ -108,6 +101,7 @@ export default function SunnahScreen({
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
   const { location, timeZone, settings } = useResolvedSettings();
+  const formatTime = useFormattedTime();
   const [now, setNow] = useState(() => new Date());
 
   useEffect(() => {

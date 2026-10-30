@@ -15,10 +15,12 @@ import {
   formatMoney,
   type CharityEntry,
 } from '../../lib/charity';
-import { colors, radius, spacing, typography } from '../../theme/tokens';
+import { radius, spacing, typography } from '../../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../../theme/ThemeContext';
 import { CATEGORY_ICONS } from './categoryIcons';
 
 function Sparkline({ data }: { data: number[] }) {
+  const { colors } = useTheme();
   if (data.length < 2) return null;
   const w = 96;
   const h = 28;
@@ -67,6 +69,8 @@ export default function SadaqahLogCard({
   onAddPayment: () => void;
   onOpenAll: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const given = charity.givenThisHawl(hawlStartISO);
   const pct = zakatDue > 0 ? Math.min(1, given / zakatDue) : null;
   const pctLabel = pct === null ? null : Math.round(pct * 100);
@@ -186,7 +190,7 @@ export default function SadaqahLogCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     padding: spacing.lg,
     borderRadius: radius.lg,

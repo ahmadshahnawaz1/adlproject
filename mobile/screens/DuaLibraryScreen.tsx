@@ -24,10 +24,14 @@ import {
   duasInCategory,
   matchesQuery,
   searchDuas,
+  searchIn,
   type Dua,
   type DuaCategoryId,
 } from '../lib/duaSearch';
-import { DUA_LIBRARY_DISCLAIMER } from '../content/duas-library';
+import { ALL_DUAS, DUA_LIBRARY_DISCLAIMER } from '../content/duas-library';
+import { DUA_FIELDS, DUA_LOCALES } from '../content/duas-library/locales';
+import { loadTable, localize } from '../lib/contentI18n';
+import { useLocale } from '../i18n/LocaleContext';
 import { fontFamily, radius, spacing, typography } from '../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
@@ -41,18 +45,27 @@ export default function DuaLibraryScreen({ onClose }: { onClose?: () => void }) 
   const [infoOpen, setInfoOpen] = useState(false);
 
   const trimmed = query.trim();
+  const { code } = useLocale();
+
+  // The catalogue in the reader's language; untranslated fields stay English.
+  const table = useMemo(() => loadTable(DUA_LOCALES, code), [code]);
+  const pool = useMemo(() => localize(ALL_DUAS, table, DUA_FIELDS), [table]);
+  const byId = useMemo(() => new Map(pool.map((d) => [d.id, d])), [pool]);
 
   // What the body shows. `null` means the browse board (the category grid);
   // anything else is a list of supplications — a category, the favourites, or
   // a search across the catalogue (optionally narrowed to a category).
   const results = useMemo<Dua[] | null>(() => {
     if (view === 'favorites') {
-      return trimmed ? favorites.filter((d) => matchesQuery(d, query)) : favorites;
+      const favs = favorites.map((f) => byId.get(f.id) ?? f);
+      return trimmed ? favs.filter((d) => matchesQuery(d, query)) : favs;
     }
-    if (trimmed) return searchDuas(query, categoryId ?? undefined);
-    if (categoryId) return duasInCategory(categoryId);
+    if (trimmed) {
+      return searchIn(categoryId ? pool.filter((d) => d.category === categoryId) : pool, query);
+    }
+    if (categoryId) return pool.filter((d) => d.category === categoryId);
     return null;
-  }, [view, trimmed, query, categoryId, favorites]);
+  }, [view, trimmed, query, categoryId, favorites, pool, byId]);
 
   const showGrid = results === null;
   const activeCategory = categoryId ? categoryById(categoryId) : undefined;

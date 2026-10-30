@@ -10,7 +10,7 @@
  * State is stored per journey kind, so ʿUmrah and Ḥajj progress independently.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import { journeyOf } from '../content/pilgrimage';
 import type { HajjType, PilgrimageKind } from '../content/pilgrimage';
 import { clampStepIndex, incrementCount, journeyStepCount } from '../lib/pilgrimage';

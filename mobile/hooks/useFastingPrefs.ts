@@ -7,7 +7,7 @@
  * Sensible defaults mean a fresh user never has to open settings.
  */
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 
 const PREFS_KEY = 'adl.fastingPrefs.v1';
 

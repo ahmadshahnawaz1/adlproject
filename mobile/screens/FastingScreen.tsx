@@ -28,7 +28,7 @@ import {
   ramadanInfo,
   upcomingVoluntaryFasts,
 } from '../lib/fasting';
-import { formatCountdown, formatDuration, formatTime, dayKeyInZone } from '../lib/clock';
+import { formatCountdown, formatDuration, dayKeyInZone } from '../lib/clock';
 import { scheduleFastingReminders, cancelAllFasting } from '../lib/fastingNotifications';
 import { ASHRAS, FASTING_DUAS, RAMADAN_MONTH } from '../content/fasting';
 import useFastingPrefs from '../hooks/useFastingPrefs';
@@ -36,6 +36,7 @@ import useFastingLog from '../hooks/useFastingLog';
 import useFastingLedger from '../hooks/useFastingLedger';
 import useQuranKhatm from '../hooks/useQuranKhatm';
 import useResolvedSettings from '../hooks/useResolvedSettings';
+import useFormattedTime from '../hooks/useFormattedTime';
 import { radius, spacing, typography } from '../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import FastingDayArc from '../components/FastingDayArc';
@@ -69,6 +70,7 @@ export default function FastingScreen({
   const ledger = useFastingLedger();
   const khatm = useQuranKhatm();
   const { location, timeZone, settings } = useResolvedSettings();
+  const formatTime = useFormattedTime();
   const coords = location.coords;
 
   const [now, setNow] = useState(() => new Date());

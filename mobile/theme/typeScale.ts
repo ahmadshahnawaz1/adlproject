@@ -22,6 +22,19 @@ export function scaleFont(size: number, scale: number): number {
   return Math.round(size * clampTextScale(scale) * 2) / 2;
 }
 
+type TextMetrics = { fontSize?: number; lineHeight?: number };
+
+export function scaleTextMetrics(metrics: TextMetrics, scale: number): TextMetrics {
+  const result: TextMetrics = {};
+  if (metrics.fontSize != null && Number.isFinite(metrics.fontSize) && metrics.fontSize > 0) {
+    result.fontSize = scaleFont(metrics.fontSize, scale);
+  }
+  if (metrics.lineHeight != null && Number.isFinite(metrics.lineHeight) && metrics.lineHeight > 0) {
+    result.lineHeight = Math.max(result.fontSize ?? 0, scaleFont(metrics.lineHeight, scale));
+  }
+  return result;
+}
+
 /** A human label for a text-scale value, e.g. "100%". */
 export function textScaleLabel(scale: number): string {
   return `${Math.round(clampTextScale(scale) * 100)}%`;

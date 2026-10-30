@@ -19,7 +19,8 @@ import * as Haptics from 'expo-haptics';
 import type { Dua as FastingDua } from '../content/fasting';
 import type { Daleel, Gender, Madhhab, RiteStep } from '../content/pilgrimage';
 import type { MadhhabPref } from '../hooks/usePilgrimagePrefs';
-import { arabicFont, colors, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { arabicFont, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import DaleelBlock from './DaleelBlock';
 import DuaCard from './DuaCard';
 import JamaratView from './JamaratView';
@@ -33,7 +34,7 @@ const RANK_LABEL: Record<RiteStep['rank'], string> = {
   sunnah: 'Sunnah',
 };
 
-function rankTone(rank: RiteStep['rank']): { bg: string; fg: string } {
+function rankTone(rank: RiteStep['rank'], colors: ThemeColors): { bg: string; fg: string } {
   switch (rank) {
     case 'rukn':
       return { bg: 'rgba(255,214,10,0.12)', fg: colors.primary };
@@ -84,7 +85,9 @@ export default function RiteStepCard({
   onResetCounter: () => void;
   activeSiteId?: string | null;
 }) {
-  const tone = rankTone(step.rank);
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
+  const tone = rankTone(step.rank, colors);
   const notes = useMemo(
     () => (step.notes ?? []).filter((n) => noteApplies(n, madhhab, gender)),
     [step.notes, madhhab, gender],
@@ -257,7 +260,7 @@ export default function RiteStepCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { backgroundColor: colors.card, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, overflow: 'hidden' },
   dimmed: { opacity: 0.62 },
   scene: { position: 'relative' },

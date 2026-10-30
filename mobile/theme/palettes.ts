@@ -39,7 +39,8 @@ export const darkPalette: ThemeColors = {
   input: '#0A0A0C',
   foreground: '#FAFAFA',
   mutedForeground: '#A1A1AA',
-  subtleForeground: '#71717A',
+  // Lifted from #71717A, which sat at 4.12:1 on card — below WCAG AA for body text.
+  subtleForeground: '#8A8A94',
   primary: '#FFD60A',
   primaryForeground: '#000000',
   ring: '#FFD60A',
@@ -62,7 +63,8 @@ export const lightPalette: ThemeColors = {
   input: '#FFFFFF',
   foreground: '#18181B',
   mutedForeground: '#52525B',
-  subtleForeground: '#71717A',
+  // Lifted from #71717A, which sat at 4.40:1 on the grey background — below AA.
+  subtleForeground: '#6B6B75',
   primary: '#A16207',
   primaryForeground: '#FFFFFF',
   ring: '#A16207',

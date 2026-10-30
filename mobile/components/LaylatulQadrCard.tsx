@@ -8,7 +8,8 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Star } from 'lucide-react-native';
 import { DALEEL_QADR, DALEEL_QADR_SEEK, FASTING_DUAS, ODD_NIGHTS } from '../content/fasting';
 import type { RamadanInfo } from '../lib/fasting';
-import { arabicFont, colors, radius, spacing, typography } from '../theme/tokens';
+import { arabicFont, radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import DaleelBlock from './DaleelBlock';
 
 const QADR_DUA = FASTING_DUAS.find((d) => d.id === 'qadr');
@@ -20,6 +21,8 @@ export default function LaylatulQadrCard({
   info: RamadanInfo;
   showArabic?: boolean;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.card}>
       <View style={styles.head}>
@@ -59,7 +62,7 @@ export default function LaylatulQadrCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     padding: spacing.lg,
     borderRadius: radius.lg,

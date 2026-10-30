@@ -10,7 +10,8 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Line, Rect, Text as SvgText } from 'react-native-svg';
-import { colors, fontFamily, spacing, typography } from '../theme/tokens';
+import { fontFamily, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -34,6 +35,8 @@ export default function JamaratView({
   width?: number;
   caption?: string;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const pillars = Math.max(1, Math.round(total / 7));
   const perPillar = Math.round(total / pillars);
   const complete = count >= total;
@@ -110,7 +113,7 @@ export default function JamaratView({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.92 },
   readout: { fontFamily, fontSize: typography.caption.fontSize, color: colors.subtleForeground, marginTop: spacing.sm, textAlign: 'center' },

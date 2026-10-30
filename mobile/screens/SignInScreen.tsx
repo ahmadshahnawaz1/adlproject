@@ -15,6 +15,7 @@ import Divider from '../components/ui/Divider';
 import Input from '../components/ui/Input';
 import { AppleIcon, GoogleIcon } from '../components/ui/BrandIcons';
 import { isValidEmail } from '../lib/validation';
+import { useT } from '../i18n/LocaleContext';
 import { spacing, typography } from '../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
@@ -22,34 +23,53 @@ import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeConte
 export default function SignInScreen({
   onSignUp,
   onForgot,
-  onAuthenticated,
+  onSubmit,
+  onApple,
 }: {
   onSignUp?: () => void;
   onForgot?: () => void;
-  onAuthenticated?: () => void;
+  onSubmit?: (email: string, password: string) => Promise<string | null>;
+  onApple?: () => Promise<string | null>;
 }) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const t = useT();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [touched, setTouched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [appleLoading, setAppleLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const emailError = useMemo(
-    () => (touched && email && !isValidEmail(email) ? 'Enter a valid email address' : undefined),
-    [email, touched],
+    () => (touched && email && !isValidEmail(email) ? t('auth.email.invalid') : undefined),
+    [email, touched, t],
   );
 
   const canSubmit = isValidEmail(email) && password.length >= 1;
 
-  const submit = () => {
+  const submit = async () => {
     setTouched(true);
     if (!canSubmit) return;
+    setFormError(null);
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      onAuthenticated?.();
-    }, 1400); // placeholder for real auth
+    const error = await onSubmit?.(email, password);
+    setLoading(false);
+    if (error) setFormError(error);
+  };
+
+  const continueWithApple = async () => {
+    if (appleLoading) return;
+    setFormError(null);
+    setAppleLoading(true);
+    try {
+      const error = await onApple?.();
+      if (error) setFormError(error);
+    } catch {
+      setFormError(t('auth.error.generic'));
+    } finally {
+      setAppleLoading(false);
+    }
   };
 
   return (
@@ -67,33 +87,34 @@ export default function SignInScreen({
         </View>
 
         <View style={styles.header}>
-          <Text style={styles.title}>Welcome back</Text>
-          <Text style={styles.subtitle}>Sign in to continue with Adl</Text>
+          <Text style={styles.title}>{t('auth.signIn.title')}</Text>
+          <Text style={styles.subtitle}>{t('auth.signIn.subtitle')}</Text>
         </View>
 
         <View style={styles.social}>
           <Button
-            label="Continue with Apple"
+            label={t('auth.social.apple')}
             variant="secondary"
-            onPress={onAuthenticated}
+            loading={appleLoading}
+            onPress={() => { void continueWithApple(); }}
             icon={<AppleIcon size={18} color={colors.foreground} />}
           />
           <Button
-            label="Continue with Google"
+            label={t('auth.social.google')}
             variant="secondary"
-            onPress={onAuthenticated}
+            onPress={() => setFormError(t('auth.social.unavailable'))}
             icon={<GoogleIcon size={18} />}
           />
         </View>
 
         <View style={styles.dividerWrap}>
-          <Divider label="or sign in with email" />
+          <Divider label={t('auth.signIn.divider')} />
         </View>
 
         <View style={styles.form}>
           <Input
-            label="Email"
-            placeholder="you@example.com"
+            label={t('auth.email.label')}
+            placeholder={t('auth.email.placeholder')}
             value={email}
             onChangeText={setEmail}
             onBlur={() => setTouched(true)}
@@ -104,13 +125,13 @@ export default function SignInScreen({
           />
           <View>
             <View style={styles.passwordRow}>
-              <Text style={styles.passwordLabel}>Password</Text>
+              <Text style={styles.passwordLabel}>{t('auth.password.label')}</Text>
               <Pressable hitSlop={8} onPress={onForgot}>
-                <Text style={styles.forgot}>Forgot password?</Text>
+                <Text style={styles.forgot}>{t('auth.password.forgot')}</Text>
               </Pressable>
             </View>
             <Input
-              placeholder="Enter your password"
+              placeholder={t('auth.password.placeholder')}
               value={password}
               onChangeText={setPassword}
               isPassword
@@ -120,8 +141,12 @@ export default function SignInScreen({
           </View>
         </View>
 
+        {formError ? (
+          <Text style={{ color: colors.destructive, textAlign: 'center', marginTop: spacing.md, fontSize: 13 }}>{formError}</Text>
+        ) : null}
+
         <Button
-          label="Sign in"
+          label={t('auth.signIn.submit')}
           onPress={submit}
           loading={loading}
           disabled={!canSubmit}
@@ -129,9 +154,9 @@ export default function SignInScreen({
         />
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account? </Text>
+          <Text style={styles.footerText}>{t('auth.signIn.noAccount')}</Text>
           <Pressable onPress={onSignUp} hitSlop={8}>
-            <Text style={styles.footerLink}>Sign up</Text>
+            <Text style={styles.footerLink}>{t('auth.signIn.signUpLink')}</Text>
           </Pressable>
         </View>
       </ScrollView>

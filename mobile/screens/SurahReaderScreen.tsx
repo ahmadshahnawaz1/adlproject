@@ -23,6 +23,7 @@ import ReaderToolbar from '../components/quran/ReaderToolbar';
 import SurahHeader from '../components/quran/SurahHeader';
 import AyahRow from '../components/quran/AyahRow';
 import ReaderSettingsSheet from '../components/quran/ReaderSettingsSheet';
+import TajweedLegendSheet from '../components/quran/TajweedLegendSheet';
 import AyahActionsSheet from '../components/quran/AyahActionsSheet';
 import RecitationSheet from '../components/quran/RecitationSheet';
 import WordDetailSheet from '../components/quran/WordDetailSheet';
@@ -77,6 +78,7 @@ export default function SurahReaderScreen({
   });
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [recitationOpen, setRecitationOpen] = useState(false);
+  const [tajweedLegendOpen, setTajweedLegendOpen] = useState(false);
   const [selected, setSelected] = useState<Ayah | null>(null);
   const [word, setWord] = useState<QuranWord | null>(null);
   const [tafsirTarget, setTafsirTarget] = useState<Ayah | null>(null);
@@ -245,6 +247,7 @@ export default function SurahReaderScreen({
         showTransliteration={s.showTransliteration}
         showTranslation={s.showTranslation}
         showWordByWord={s.showWordByWord}
+        showTajweed={s.showTajweed}
         translationIds={s.translationIds}
         translationLabels={translationLabels}
         theme={theme}
@@ -269,6 +272,7 @@ export default function SurahReaderScreen({
       s.showTransliteration,
       s.showTranslation,
       s.showWordByWord,
+      s.showTajweed,
       s.translationIds,
       translationLabels,
       theme,
@@ -407,6 +411,13 @@ export default function SurahReaderScreen({
           setSettingsOpen(false);
           setRecitationOpen(true);
         }}
+        onOpenTajweedLegend={() => setTajweedLegendOpen(true)}
+      />
+
+      <TajweedLegendSheet
+        visible={tajweedLegendOpen}
+        theme={theme}
+        onClose={() => setTajweedLegendOpen(false)}
       />
 
       <RecitationSheet

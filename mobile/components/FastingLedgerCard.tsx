@@ -17,7 +17,8 @@ import {
   Trash2,
 } from 'lucide-react-native';
 import type { UseFastingLedger } from '../hooks/useFastingLedger';
-import { colors, radius, spacing, typography } from '../theme/tokens';
+import { radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const BLUE = '#60A5FA';
 
@@ -49,6 +50,8 @@ function relTime(ts: string): string {
 }
 
 export default function FastingLedgerCard({ ledger }: { ledger: UseFastingLedger }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [open, setOpen] = useState(false);
   const progressPct = Math.round(ledger.progress * 100);
 
@@ -173,7 +176,7 @@ export default function FastingLedgerCard({ ledger }: { ledger: UseFastingLedger
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     padding: spacing.lg,
     borderRadius: radius.lg,

@@ -97,38 +97,6 @@ export type Lesson = {
   tags?: string[];
 };
 
-/** One event in the Sīrah timeline. */
-export type SirahEvent = {
-  id: string;
-  /** Chronological order across the whole timeline (1 = earliest). */
-  order: number;
-  /** A display label for the period, e.g. "≈ 570 CE" or "1 AH". */
-  year: string;
-  /** The era this event belongs to, used to group the timeline. */
-  era: SirahEra;
-  /** English title of the event. */
-  title: string;
-  /** Optional Arabic title. */
-  arabic?: string;
-  /** Where it took place, e.g. "Makkah". */
-  place: string;
-  /** A one- or two-line summary shown on the timeline node. */
-  summary: string;
-  /** The fuller account. */
-  body: LessonBlock[];
-  /** Search keywords. */
-  tags?: string[];
-};
-
-/** The broad eras the Sīrah is grouped into. */
-export type SirahEra =
-  | 'before-revelation'
-  | 'makkah'
-  | 'hijrah'
-  | 'madinah'
-  | 'conquest'
-  | 'farewell';
-
 /** Optional jump from a track step into a feature of the app. */
 export type TrackAction = {
   label: string;

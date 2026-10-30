@@ -8,7 +8,7 @@
  * the running sum and the whole history can be reviewed. It also carries the
  * pure fidyah and kaffārah calculators. Pure logic + AsyncStorage — no UI.
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from './scopedStorage';
 
 export const FASTING_LEDGER_KEY = 'adl.fastingLedger.v1';
 

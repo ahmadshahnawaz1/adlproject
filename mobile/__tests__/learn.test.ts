@@ -3,17 +3,14 @@
  */
 import {
   ALL_LESSONS,
-  SIRAH_EVENTS,
   LEARN_TOPICS,
   NEW_MUSLIM_TRACK,
   lessonById,
   lessonsInTopic,
   topicById,
-  sirahEventById,
   blockText,
   bodyText,
   searchLessons,
-  searchSirah,
   searchLearn,
   groupedLessons,
   trackLength,
@@ -24,13 +21,6 @@ import {
 } from '../lib/learn';
 
 describe('content integrity', () => {
-  it('has a deep Sīrah timeline (30+ events) in strict order', () => {
-    expect(SIRAH_EVENTS.length).toBeGreaterThanOrEqual(30);
-    for (let i = 1; i < SIRAH_EVENTS.length; i++) {
-      expect(SIRAH_EVENTS[i].order).toBeGreaterThan(SIRAH_EVENTS[i - 1].order);
-    }
-  });
-
   it('exposes the four topics including the New Muslim track', () => {
     const ids = LEARN_TOPICS.map((t) => t.id).sort();
     expect(ids).toEqual(['aqidah', 'fiqh', 'new-muslim', 'sirah']);
@@ -48,11 +38,6 @@ describe('content integrity', () => {
     const ids = ALL_LESSONS.map((l) => l.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
-
-  it('uses unique Sīrah event ids', () => {
-    const ids = SIRAH_EVENTS.map((e) => e.id);
-    expect(new Set(ids).size).toBe(ids.length);
-  });
 });
 
 describe('resolvers', () => {
@@ -64,11 +49,6 @@ describe('resolvers', () => {
   it('resolves a topic by id', () => {
     expect(topicById('sirah')?.kind).toBe('sirah');
     expect(topicById('nope')).toBeUndefined();
-  });
-
-  it('resolves a Sīrah event by id', () => {
-    expect(sirahEventById('sirah-hijrah')?.year).toBe('622 CE / 1 AH');
-    expect(sirahEventById('nope')).toBeUndefined();
   });
 
   it('lists lessons in a topic', () => {
@@ -120,27 +100,19 @@ describe('search', () => {
     expect(searchLessons('ṣalāh').length).toBeGreaterThan(0);
   });
 
-  it('searches the Sīrah by event keyword', () => {
-    const hits = searchSirah('badr');
-    expect(hits[0]?.id).toBe('sirah-badr');
-  });
-
   it('requires every token to match (logical AND)', () => {
     expect(searchLessons('tawhid zzzznotaword')).toEqual([]);
   });
 
   it('returns nothing for an empty query', () => {
     expect(searchLessons('')).toEqual([]);
-    expect(searchSirah('   ')).toEqual([]);
     expect(searchLearn('')).toEqual([]);
   });
 
-  it('unifies lessons and Sīrah, lessons first', () => {
+  it('tags every unified hit as a lesson', () => {
     const hits = searchLearn('prayer');
     expect(hits.length).toBeGreaterThan(0);
-    const firstSirah = hits.findIndex((h) => h.kind === 'sirah');
-    const lastLesson = hits.map((h) => h.kind).lastIndexOf('lesson');
-    if (firstSirah !== -1) expect(lastLesson).toBeLessThan(firstSirah);
+    expect(hits.every((h) => h.kind === 'lesson')).toBe(true);
   });
 });
 

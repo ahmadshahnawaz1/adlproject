@@ -8,7 +8,7 @@
  * close, fully offline.
  */
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import {
   DEFAULT_ZAKAT_SETTINGS,
   emptyValues,

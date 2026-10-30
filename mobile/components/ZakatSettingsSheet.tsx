@@ -18,12 +18,14 @@ import type {
   ZakatSettings,
 } from '../content/zakat/zakat';
 import { hawlStatus } from '../lib/zakat';
-import { colors, radius, spacing, typography } from '../theme/tokens';
+import { radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const PROXY_OPTIONS = [10, 25, 30, 50, 100];
 const PRICE_STALE_DAYS = 7;
 
 function Seg({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable
       onPress={onPress}
@@ -47,6 +49,8 @@ function PriceInput({
   currency: string;
   onChange: (n: number) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [text, setText] = useState(value ? String(value) : '');
   return (
     <View style={styles.priceRow}>
@@ -109,6 +113,8 @@ export default function ZakatSettingsSheet({
   fetching?: boolean;
   fetchNote?: string | null;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [currencyText, setCurrencyText] = useState(settings.currency);
   const hawl = hawlStatus(settings.hawlStartISO);
   const stale = pricesStale(settings.pricesUpdatedAt);
@@ -320,8 +326,8 @@ export default function ZakatSettingsSheet({
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheet: {
     position: 'absolute',
     left: 0,

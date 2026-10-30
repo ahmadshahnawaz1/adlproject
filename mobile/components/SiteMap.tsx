@@ -9,7 +9,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import { Animated, Easing, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, G, Path, Text as SvgText } from 'react-native-svg';
 import { HAJJ_ROUTE_SITE_IDS, siteById } from '../content/pilgrimage';
-import { colors, fontFamily, spacing, typography } from '../theme/tokens';
+import { fontFamily, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
@@ -30,6 +31,8 @@ export default function SiteMap({
   width?: number;
   caption?: string;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const pts = useMemo(() => {
     const sites = HAJJ_ROUTE_SITE_IDS.map((id) => siteById(id)!).filter(Boolean);
     const lats = sites.map((s) => s.coords.latitude);
@@ -101,7 +104,7 @@ export default function SiteMap({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
   caption: { fontFamily, fontSize: typography.caption.fontSize, color: colors.subtleForeground, marginTop: spacing.sm, textAlign: 'center' },
 });

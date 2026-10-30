@@ -9,7 +9,8 @@ import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
 import type { FastPhase } from '../lib/fasting';
-import { colors, typography } from '../theme/tokens';
+import { typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -46,6 +47,8 @@ export default function FastingDayArc({
   durationText?: string;
   size?: number;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const fill = Math.min(1, Math.max(0, isFinite(progress) ? progress : 0));
   const anim = useRef(new Animated.Value(0)).current;
   const isDay = phase === 'fasting';
@@ -115,9 +118,9 @@ export default function FastingDayArc({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { alignSelf: 'center', justifyContent: 'flex-start' },
-  center: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  center: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
   label: {
     ...typography.label,
     fontSize: 11,

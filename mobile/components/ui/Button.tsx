@@ -3,10 +3,11 @@ import {
   ActivityIndicator,
   Pressable,
   StyleSheet,
-  Text,
   View,
   ViewStyle,
 } from 'react-native';
+import AppText from './AppText';
+import useA11ySettings from '../../hooks/useA11ySettings';
 import { radius, spacing, typography } from '../../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../../theme/ThemeContext';
 
@@ -34,6 +35,7 @@ export default function Button({
 }: Props) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const { minTouchSize } = useA11ySettings();
   const isDisabled = disabled || loading;
   const v = makeVariants(colors)[variant];
 
@@ -43,12 +45,14 @@ export default function Button({
       disabled={isDisabled}
       style={({ pressed }) => [
         styles.base,
+        { minHeight: Math.max(52, minTouchSize) },
         v.container,
         pressed && !isDisabled && { opacity: 0.85, transform: [{ scale: 0.99 }] },
         isDisabled && styles.disabled,
         style,
       ]}
       accessibilityRole="button"
+      accessibilityLabel={label}
       accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
       {loading ? (
@@ -56,7 +60,7 @@ export default function Button({
       ) : (
         <View style={styles.row}>
           {icon ? <View style={styles.icon}>{icon}</View> : null}
-          <Text style={[styles.label, v.label]}>{label}</Text>
+          <AppText style={[styles.label, v.label]}>{label}</AppText>
         </View>
       )}
     </Pressable>
@@ -65,15 +69,22 @@ export default function Button({
 
 const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   base: {
-    height: 52,
+    minHeight: 52,
     borderRadius: radius.md,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  row: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center' },
-  icon: { marginRight: spacing.sm },
-  label: { ...typography.button },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    alignSelf: 'stretch',
+    gap: spacing.sm,
+  },
+  icon: { flexShrink: 0 },
+  label: { ...typography.button, flexShrink: 1, textAlign: 'center', letterSpacing: 0 },
   disabled: { opacity: 0.5 },
 });
 

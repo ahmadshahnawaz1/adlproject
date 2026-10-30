@@ -17,6 +17,7 @@ import {
 import { Bookmark, Pause, Play } from 'lucide-react-native';
 import AyahMedallion from './AyahMedallion';
 import WordByWord from './WordByWord';
+import TajweedText from './TajweedText';
 import TranslationBlock from './TranslationBlock';
 import type { Ayah, QuranWord } from '../../content/quran/types';
 import type { ReaderTheme } from '../../theme/quranReaderThemes';
@@ -30,6 +31,7 @@ function AyahRow({
   showTransliteration,
   showTranslation,
   showWordByWord,
+  showTajweed = false,
   translationIds,
   translationLabels,
   theme,
@@ -50,6 +52,7 @@ function AyahRow({
   showTransliteration: boolean;
   showTranslation: boolean;
   showWordByWord: boolean;
+  showTajweed?: boolean;
   translationIds: string[];
   /** Edition id → display name, for labelling stacked translations. */
   translationLabels?: Record<string, string>;
@@ -129,7 +132,10 @@ function AyahRow({
           onWordPress={(word, index) => onWordPress?.(word, index, ayah)}
         />
       ) : (
-        <Text
+        <TajweedText
+          text={ayah.arabic}
+          baseColor={theme.text}
+          enabled={showTajweed}
           style={[
             styles.arabic,
             {
@@ -139,10 +145,7 @@ function AyahRow({
               lineHeight: arabicLineHeight,
             },
           ]}
-          allowFontScaling={false}
-        >
-          {ayah.arabic}
-        </Text>
+        />
       )}
 
       {showTransliteration && !wbw && ayah.transliteration ? (

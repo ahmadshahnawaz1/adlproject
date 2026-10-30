@@ -7,7 +7,8 @@
  * no UI, no network. Days are keyed 'YYYY-MM-DD' in the user's local zone so
  * the record lines up with what they actually saw on the schedule.
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from './scopedStorage';
+import { dayKey } from './clock';
 import type { PrayerName } from './prayerTimes';
 
 export const LOG_KEY = 'adl.prayerLog.v1';
@@ -69,10 +70,8 @@ export function nextStatus(s: PrayerStatus | undefined): PrayerStatus {
   return CYCLE[(i + 1) % CYCLE.length];
 }
 
-/** Local 'YYYY-MM-DD' key for a date (device-local, en-CA = ISO order). */
-export function dayKey(date: Date = new Date()): string {
-  return date.toLocaleDateString('en-CA');
-}
+// dayKey is centralized in lib/clock; re-exported for existing importers.
+export { dayKey };
 
 /** Read the full log from storage (empty object on first run / error). */
 export async function loadLog(): Promise<PrayerLog> {

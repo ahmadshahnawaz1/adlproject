@@ -3,22 +3,21 @@
     "name": "Adl",
     "slug": "mobile",
     "version": "1.0.0",
+    "runtimeVersion": { "policy": "appVersion" },
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "dark",
+    "userInterfaceStyle": "automatic",
     "backgroundColor": "#000000",
-    "splash": {
-      "image": "./assets/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#000000"
-    },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.adl.app",
       "infoPlist": {
-        "NSLocationWhenInUseUsageDescription": "Adl uses your location to calculate precise prayer times for where you are."
+        "NSLocationWhenInUseUsageDescription": "Adl uses your location to calculate precise prayer times for where you are.",
+        "NSCameraUsageDescription": "Adl uses the camera to scan product barcodes so it can check the ingredients for you."
       }
     },
     "android": {
+      "package": "com.adl.app",
       "adaptiveIcon": {
         "backgroundColor": "#000000",
         "foregroundImage": "./assets/android-icon-foreground.png",
@@ -28,6 +27,7 @@
       "permissions": [
         "ACCESS_FINE_LOCATION",
         "ACCESS_COARSE_LOCATION",
+        "CAMERA",
         "RECEIVE_BOOT_COMPLETED",
         "SCHEDULE_EXACT_ALARM",
         "VIBRATE"
@@ -38,6 +38,15 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#000000"
+        }
+      ],
       [
         "expo-location",
         {
@@ -52,7 +61,22 @@
         }
       ],
       "expo-font",
-      "expo-audio"
+      "expo-audio",
+      "expo-localization",
+      "expo-secure-store",
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Adl uses Face ID to unlock the app."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Adl uses the camera to scan product barcodes so it can check the ingredients for you.",
+          "recordAudioAndroid": false
+        }
+      ]
     ]
   }
 }

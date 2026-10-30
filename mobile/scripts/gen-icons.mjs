@@ -1,6 +1,7 @@
 // Generates ADL app icons + splash from the "عدل" wordmark (Amiri, white on black).
 // Run: node scripts/gen-icons.mjs
 import sharp from 'sharp';
+import { Buffer } from 'node:buffer';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 
@@ -38,7 +39,11 @@ async function main() {
   // Android adaptive icon: foreground wordmark (transparent) + black background.
   await write('android-icon-foreground.png', 1024, { transparentBg: true, ratio: 0.36 });
   await write('android-icon-background.png', 1024, { bg: BLACK, fill: BLACK });
-  await write('android-icon-monochrome.png', 1024, { transparentBg: true, fill: WHITE, ratio: 0.36 });
+  await write('android-icon-monochrome.png', 1024, {
+    transparentBg: true,
+    fill: WHITE,
+    ratio: 0.36,
+  });
   console.log('All ADL icons generated.');
 }
 

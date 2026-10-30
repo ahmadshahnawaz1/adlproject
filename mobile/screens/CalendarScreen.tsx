@@ -18,6 +18,7 @@ import {
   type CalendarCell,
 } from '../lib/hijriCalendar';
 import useResolvedSettings from '../hooks/useResolvedSettings';
+import useFormattedTime from '../hooks/useFormattedTime';
 import usePrayerLog from '../hooks/usePrayerLog';
 import { getPrayerTimes } from '../lib/prayerTimes';
 import { dayKey, dayOf, isComplete, prayedCount, OBLIGATORY } from '../lib/prayerLog';
@@ -34,20 +35,12 @@ const ARABIC: Record<string, string> = {
   isha: '\u0627\u0644\u0639\u0634\u0627\u0621',
 };
 
-function hm(date: Date, timeZone: string): string {
-  return date.toLocaleTimeString('en-US', {
-    timeZone,
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
-}
-
 export default function CalendarScreen() {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
   const today = useMemo(() => new Date(), []);
   const { location, timeZone, settings } = useResolvedSettings();
+  const hm = useFormattedTime();
   const { log, day, cycle, clearDay } = usePrayerLog();
   const [year, setYear] = useState(today.getFullYear());
   const [month, setMonth] = useState(today.getMonth());

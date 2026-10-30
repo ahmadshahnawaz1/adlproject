@@ -23,6 +23,8 @@ import useBreathing from '../hooks/useBreathing';
 import useLocation from '../hooks/useLocation';
 import usePrayerPrefs from '../hooks/usePrayerPrefs';
 import useNotificationPrefs from '../hooks/useNotificationPrefs';
+import useFormattedTime from '../hooks/useFormattedTime';
+import { useSettings } from '../contexts/SettingsContext';
 import CityPicker from '../components/CityPicker';
 import PrayerSettingsSheet from '../components/PrayerSettingsSheet';
 import NotificationSettingsSheet from '../components/NotificationSettingsSheet';
@@ -71,15 +73,6 @@ const makeRows = (colors: ThemeColors): Row[] => {
     { key: 'isha', label: 'Isha', arabic: '\u0627\u0644\u0639\u0634\u0627\u0621', icon: (a) => <MoonStar size={22} color={tint(a)} strokeWidth={2} /> },
   ];
 };
-
-function formatTime(date: Date, timeZone: string): string {
-  return date.toLocaleTimeString('en-US', {
-    timeZone,
-    hour: 'numeric',
-    minute: '2-digit',
-    hour12: true,
-  });
-}
 
 function formatHijriAndDate(date: Date, timeZone: string): string {
   const greg = date.toLocaleDateString('en-US', {
@@ -145,7 +138,7 @@ export default function PrayerScreen() {
   const styles = useThemedStyles(makeStyles);
   const ROWS = useMemo(() => makeRows(colors), [colors]);
   const { opacity: glow } = useBreathing();
-  const { location, refreshing, useGps, setCity } = useLocation();
+  const { location, refreshing, useGps: refreshGps, setCity } = useLocation();
   const { prefs, setPref, setAdjustment, resetAdjustments } = usePrayerPrefs();
   const {
     prefs: notify,
@@ -167,6 +160,8 @@ export default function PrayerScreen() {
 
   const coords = location.coords;
   const timeZone = location.timeZone;
+  const formatTime = useFormattedTime();
+  const { settings: appSettings } = useSettings();
 
   // The calendar day in the prayer location's timezone. When this changes the
   // schedule must roll over to the new day's times.
@@ -267,6 +262,12 @@ export default function PrayerScreen() {
         config: toConfig(notify),
         cityLabel: location.label,
         from: new Date(),
+        timeZone: location.timeZone,
+        quietHours: {
+          enabled: appSettings.notifications.quietHoursEnabled,
+          start: appSettings.notifications.quietStart,
+          end: appSettings.notifications.quietEnd,
+        },
       }).catch(() => {});
 
       if (notify.qazaReminder) {
@@ -285,6 +286,7 @@ export default function PrayerScreen() {
     coords.latitude,
     coords.longitude,
     location.label,
+    appSettings.notifications,
     dayKey,
     toConfig,
   ]);
@@ -391,7 +393,7 @@ export default function PrayerScreen() {
         refreshing={refreshing}
         onClose={() => setPickerOpen(false)}
         onUseGps={() => {
-          useGps();
+          refreshGps();
           setPickerOpen(false);
         }}
         onPickCity={(city) => {

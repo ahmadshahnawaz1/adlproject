@@ -115,18 +115,18 @@ const METHOD_FACTORIES: Record<CalculationMethodKey, () => ReturnType<typeof Cal
   Other: CalculationMethod.Other,
 };
 
-const MADHAB: Record<MadhabKey, Madhab> = {
+const MADHAB: Record<MadhabKey, (typeof Madhab)[keyof typeof Madhab]> = {
   Standard: Madhab.Shafi,
   Hanafi: Madhab.Hanafi,
 };
 
-const HIGH_LAT: Record<HighLatitudeRuleKey, HighLatitudeRule> = {
+const HIGH_LAT: Record<HighLatitudeRuleKey, (typeof HighLatitudeRule)[keyof typeof HighLatitudeRule]> = {
   MiddleOfTheNight: HighLatitudeRule.MiddleOfTheNight,
   SeventhOfTheNight: HighLatitudeRule.SeventhOfTheNight,
   TwilightAngle: HighLatitudeRule.TwilightAngle,
 };
 
-const POLAR: Record<PolarCircleResolutionKey, PolarCircleResolution> = {
+const POLAR: Record<PolarCircleResolutionKey, (typeof PolarCircleResolution)[keyof typeof PolarCircleResolution]> = {
   AqrabBalad: PolarCircleResolution.AqrabBalad,
   AqrabYaum: PolarCircleResolution.AqrabYaum,
   Unresolved: PolarCircleResolution.Unresolved,

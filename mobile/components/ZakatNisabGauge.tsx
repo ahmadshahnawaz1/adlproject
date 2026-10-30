@@ -7,7 +7,8 @@
 import { useEffect, useRef } from 'react';
 import { Animated, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
-import { colors, typography } from '../theme/tokens';
+import { typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 
@@ -47,6 +48,8 @@ export default function ZakatNisabGauge({
   centerSub?: string;
   size?: number;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const fill = Math.min(1, Math.max(0, isFinite(ratio) ? ratio : 0));
   const progress = useRef(new Animated.Value(0)).current;
   const accent = meetsNisab ? colors.primary : colors.mutedForeground;
@@ -102,10 +105,10 @@ export default function ZakatNisabGauge({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
   center: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,

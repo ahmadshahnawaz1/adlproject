@@ -10,7 +10,8 @@
 import { useEffect, useMemo, useRef } from 'react';
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from 'react-native';
 import Svg, { Circle, Rect } from 'react-native-svg';
-import { colors, fontFamily, spacing, typography } from '../theme/tokens';
+import { fontFamily, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const AnimatedCircle = Animated.createAnimatedComponent(Circle);
 
@@ -30,6 +31,8 @@ export default function TawafRing({
   size?: number;
   caption?: string;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const complete = count >= total;
   const frac = Math.min(1, total > 0 ? count / total : 0);
 
@@ -126,14 +129,14 @@ export default function TawafRing({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.92 },
   orbitLayer: { alignItems: 'center' },
   markerWrap: { position: 'absolute', alignItems: 'center', justifyContent: 'center' },
   markerHalo: { position: 'absolute', width: 22, height: 22, borderRadius: 11, backgroundColor: colors.primary, opacity: 0.18 },
   markerDot: { width: 11, height: 11, borderRadius: 6, backgroundColor: colors.primary },
-  center: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  center: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
   count: { fontFamily, fontSize: 44, fontWeight: '700', color: colors.foreground, letterSpacing: -1 },
   total: { fontFamily, fontSize: typography.label.fontSize, color: colors.mutedForeground, marginTop: -2 },
   hint: { fontFamily, fontSize: typography.caption.fontSize, color: colors.subtleForeground, marginTop: spacing.md, textAlign: 'center' },

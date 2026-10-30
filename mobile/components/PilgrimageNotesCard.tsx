@@ -15,7 +15,8 @@ import {
   PILGRIMAGE_VIRTUES,
 } from '../content/pilgrimage';
 import type { GuidanceNote } from '../content/pilgrimage';
-import { colors, fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { fontFamily, radius, spacing, typography } from '../theme/tokens';
+import { useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import DaleelBlock from './DaleelBlock';
 
 type TabKey = 'virtues' | 'adab' | 'mistakes';
@@ -26,6 +27,7 @@ const TABS: { key: TabKey; label: string }[] = [
 ];
 
 export default function PilgrimageNotesCard({ haptics = true }: { haptics?: boolean }) {
+  const styles = useThemedStyles(makeStyles);
   const [tab, setTab] = useState<TabKey>('virtues');
 
   const notes: GuidanceNote[] = useMemo(() => {
@@ -83,7 +85,7 @@ export default function PilgrimageNotesCard({ haptics = true }: { haptics?: bool
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { gap: spacing.md },
   segment: { flexDirection: 'row', backgroundColor: colors.input, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, padding: 3, gap: 3 },
   segmentItem: { flex: 1, height: 34, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },

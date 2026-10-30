@@ -1,0 +1,245 @@
+{
+  "App.tsx": {
+    "react-hooks/refs": {
+      "count": 9
+    }
+  },
+  "components/AmbientScenes.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "components/ArafahScene.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "components/FastingDayArc.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "components/JamaratView.tsx": {
+    "react-hooks/refs": {
+      "count": 6
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "components/KaabaScene.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "components/ParallaxScene.tsx": {
+    "react-hooks/refs": {
+      "count": 6
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "components/PostureScene.tsx": {
+    "react-hooks/refs": {
+      "count": 15
+    }
+  },
+  "components/PrayerStatusPill.tsx": {
+    "react-hooks/refs": {
+      "count": 12
+    }
+  },
+  "components/ProgressRing.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "components/SaiTrack.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "components/SceneSwitcher.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "components/Sidebar.tsx": {
+    "react-hooks/refs": {
+      "count": 6
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "components/SiteMap.tsx": {
+    "react-hooks/refs": {
+      "count": 7
+    }
+  },
+  "components/StageTimeline.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "components/TasbihBead.tsx": {
+    "react-hooks/refs": {
+      "count": 11
+    }
+  },
+  "components/TawafRing.tsx": {
+    "react-hooks/refs": {
+      "count": 8
+    }
+  },
+  "components/WuduStepArt.tsx": {
+    "react-hooks/refs": {
+      "count": 18
+    }
+  },
+  "components/ZakatNisabGauge.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "components/ZakatWizard.tsx": {
+    "react-hooks/refs": {
+      "count": 11
+    }
+  },
+  "components/ai/TypingDots.tsx": {
+    "react-hooks/refs": {
+      "count": 5
+    }
+  },
+  "components/common/ReorderableList.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "components/hadith/HadithSettingsSheet.tsx": {
+    "react-hooks/static-components": {
+      "count": 2
+    }
+  },
+  "components/names/NameQuizSheet.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "components/quran/TafsirSheet.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "components/sadaqah/SadaqahEntrySheet.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "components/settings/dialogs.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "components/settings/sectionsAccessSoundData.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "components/sirah/SirahTimeline.tsx": {
+    "react-hooks/immutability": {
+      "count": 1
+    }
+  },
+  "components/tahajjud/NightTimeline.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "contexts/NavigationContext.tsx": {
+    "react-hooks/refs": {
+      "count": 2
+    }
+  },
+  "hooks/useAppLock.ts": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "hooks/useBreathing.ts": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "hooks/useQuranContent.ts": {
+    "react-hooks/set-state-in-effect": {
+      "count": 2
+    }
+  },
+  "hooks/useRecitationPlayer.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "hooks/useTasbih.ts": {
+    "react-hooks/refs": {
+      "count": 1
+    }
+  },
+  "screens/DashboardScreen.tsx": {
+    "react-hooks/refs": {
+      "count": 3
+    }
+  },
+  "screens/HadithCollectionScreen.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "screens/HalalScannerScreen.tsx": {
+    "react-hooks/purity": {
+      "count": 1
+    }
+  },
+  "screens/HomeScreen.tsx": {
+    "react-hooks/use-memo": {
+      "count": 1
+    }
+  },
+  "screens/JourneyRunner.tsx": {
+    "react-hooks/refs": {
+      "count": 4
+    }
+  },
+  "screens/PrayerScreen.tsx": {
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "screens/SalahGuideScreen.tsx": {
+    "react-hooks/refs": {
+      "count": 16
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  },
+  "screens/SurahReaderScreen.tsx": {
+    "react-hooks/refs": {
+      "count": 8
+    }
+  },
+  "screens/WuduScreen.tsx": {
+    "react-hooks/refs": {
+      "count": 16
+    },
+    "react-hooks/set-state-in-effect": {
+      "count": 1
+    }
+  }
+}

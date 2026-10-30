@@ -8,13 +8,14 @@ import { Animated, Pressable, StyleSheet, Text, View } from 'react-native';
 import { ChevronRight, Moon } from 'lucide-react-native';
 import { useTahajjudWindow } from '../../hooks/useTahajjud';
 import useBreathing from '../../hooks/useBreathing';
-import { formatTime } from '../../lib/clock';
+import useFormattedTime from '../../hooks/useFormattedTime';
 import { fontFamily, radius, spacing, typography } from '../../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../../theme/ThemeContext';
 
 export default function TahajjudCard({ onOpen }: { onOpen?: () => void }) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const formatTime = useFormattedTime();
   const { window, countdown, timeZone } = useTahajjudWindow();
   const { opacity } = useBreathing({ min: 0.3, max: 0.7, duration: 2200 });
 
@@ -71,7 +72,7 @@ const makeStyles = (colors: ThemeColors) => StyleSheet.create({
     backgroundColor: colors.cardElevated,
   },
   halo: {
-    ...StyleSheet.absoluteFillObject,
+    ...StyleSheet.absoluteFill,
     borderRadius: 999,
     backgroundColor: `${colors.primary}26`,
   },

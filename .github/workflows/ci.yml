@@ -1,0 +1,57 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    name: Lint, format, type-check, test & export
+    runs-on: ubuntu-latest
+    env:
+      TZ: UTC
+    defaults:
+      run:
+        working-directory: mobile
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: mobile/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Expo SDK compatibility
+        run: npx expo install --check
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Formatting (new and changed source)
+        run: npm run format:check
+
+      - name: Type-check
+        run: npm run typecheck
+
+      - name: Unit tests
+        run: npx jest --runInBand --ci
+
+      - name: Offline native bundle exports
+        env:
+          EXPO_OFFLINE: 1
+          EXPO_NO_TELEMETRY: 1
+          NODE_OPTIONS: --max-old-space-size=2560
+        run: |
+          for platform in ios android; do
+            npx expo export --platform "$platform" --max-workers 1 --output-dir "/tmp/export/$platform"
+            node -e 'const fs = require("node:fs"); const path = require("node:path"); const platform = process.argv[1]; const root = `/tmp/export/${platform}`; const metadata = JSON.parse(fs.readFileSync(path.join(root, "metadata.json"), "utf8")); const bundle = path.join(root, metadata.fileMetadata[platform].bundle); if (!fs.statSync(bundle).size) throw new Error("Empty native bundle");' "$platform"
+          done

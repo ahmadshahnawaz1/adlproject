@@ -9,7 +9,7 @@
  * lib/zakat; this hook owns the stored prefs and the scheduling.
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 
 import { hawlStatus } from '../lib/zakat';
 import {

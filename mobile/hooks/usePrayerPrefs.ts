@@ -10,7 +10,7 @@
  * Sensible defaults mean a fresh user never has to touch any of this.
  */
 import { useCallback, useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import type { HighLatitudeRuleKey, MadhabKey, PrayerName } from '../lib/prayerTimes';
 import type { OfficialSourceId } from '../lib/officialSources';
 

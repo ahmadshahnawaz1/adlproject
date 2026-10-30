@@ -14,6 +14,27 @@ export function formatTime(date: Date, timeZone: string): string {
   });
 }
 
+const ARABIC_INDIC = ['٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩'];
+
+/** Convert Western digits in a string to Arabic-Indic numerals. */
+export function toArabicDigits(input: string): string {
+  return input.replace(/[0-9]/g, (d) => ARABIC_INDIC[Number(d)]);
+}
+
+export type TimeFormatMode = 'system' | '12h' | '24h';
+
+/** Format a wall-clock time honoring a 12/24-hour mode and numeral system. */
+export function formatTimeMode(
+  date: Date,
+  timeZone: string,
+  mode: TimeFormatMode = 'system',
+  arabicNumerals = false,
+): string {
+  const hour12 = mode === 'system' ? undefined : mode === '12h';
+  const s = date.toLocaleTimeString('en-US', { timeZone, hour: 'numeric', minute: '2-digit', hour12 });
+  return arabicNumerals ? toArabicDigits(s) : s;
+}
+
 /**
  * A compact countdown: "2:34:18" when an hour or more remains, otherwise
  * "34:18". Negative inputs clamp to zero.
@@ -40,6 +61,11 @@ export function formatDuration(ms: number): string {
   if (h > 0 && m > 0) return `${h}h ${m}m`;
   if (h > 0) return `${h}h`;
   return `${m}m`;
+}
+
+/** The device-local calendar day as an ISO "YYYY-MM-DD" key. */
+export function dayKey(date: Date = new Date()): string {
+  return date.toLocaleDateString('en-CA');
 }
 
 /** The local calendar day as an ISO "YYYY-MM-DD" key in the given time zone. */

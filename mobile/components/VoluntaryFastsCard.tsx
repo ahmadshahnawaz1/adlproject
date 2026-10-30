@@ -9,7 +9,8 @@ import { Pressable, StyleSheet, Switch, Text, View } from 'react-native';
 import { CalendarHeart, ChevronDown, ChevronUp, TriangleAlert } from 'lucide-react-native';
 import type { VoluntarySuggestion } from '../lib/fasting';
 import type { ForbiddenFast } from '../content/fasting';
-import { arabicFont, colors, radius, spacing, typography } from '../theme/tokens';
+import { arabicFont, radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 import DaleelBlock from './DaleelBlock';
 
 function whenLabel(daysAway: number, date: Date, timeZone: string): string {
@@ -34,6 +35,8 @@ export default function VoluntaryFastsCard({
   onToggleRemind: (v: boolean) => void;
   showArabic?: boolean;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [openId, setOpenId] = useState<string | null>(null);
   const top = suggestions.slice(0, 5);
 
@@ -109,7 +112,7 @@ export default function VoluntaryFastsCard({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     padding: spacing.lg,
     borderRadius: radius.lg,

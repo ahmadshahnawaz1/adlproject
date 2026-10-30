@@ -22,7 +22,8 @@ import {
   configurePilgrimageNotifications,
   sendTestPilgrimageNotification,
 } from '../lib/pilgrimageNotifications';
-import { colors, radius, spacing, typography } from '../theme/tokens';
+import { radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const REMINDER_ROWS: { key: keyof PilgrimageReminderToggles; label: string; sub: string }[] = [
   { key: 'dhulHijjah', label: 'The blessed ten', sub: 'As the first ten of Dhū al-Ḥijjah begin' },
@@ -45,6 +46,8 @@ export default function PilgrimageSettingsSheet({
   onSetReminder: (key: keyof PilgrimageReminderToggles, value: boolean) => void;
   onReset: () => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [testMsg, setTestMsg] = useState<string | null>(null);
 
   async function handleRemindersOn(v: boolean) {
@@ -214,6 +217,7 @@ export default function PilgrimageSettingsSheet({
 }
 
 function Seg({ label, selected, onPress }: { label: string; selected: boolean; onPress: () => void }) {
+  const styles = useThemedStyles(makeStyles);
   return (
     <Pressable onPress={onPress} style={({ pressed }) => [styles.segBtn, selected && styles.segBtnActive, pressed && styles.pressed]}>
       <Text style={[styles.segText, selected && styles.segTextActive]}>{label}</Text>
@@ -221,8 +225,8 @@ function Seg({ label, selected, onPress }: { label: string; selected: boolean; o
   );
 }
 
-const styles = StyleSheet.create({
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheet: {
     position: 'absolute',
     left: 0,

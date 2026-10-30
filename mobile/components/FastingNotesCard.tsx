@@ -6,9 +6,12 @@
 import { StyleSheet, Text, View } from 'react-native';
 import { CircleCheck, CircleAlert, Info } from 'lucide-react-native';
 import { FASTING_DISCLAIMER, FASTING_MISTAKES, FASTING_SUNAN } from '../content/fasting';
-import { colors, radius, spacing, typography } from '../theme/tokens';
+import { radius, spacing, typography } from '../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 export default function FastingNotesCard() {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.card}>
       <Text style={styles.section}>Sunan of the fast</Text>
@@ -46,7 +49,7 @@ export default function FastingNotesCard() {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     padding: spacing.lg,
     borderRadius: radius.lg,

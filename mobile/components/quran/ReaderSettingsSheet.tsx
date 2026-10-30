@@ -10,7 +10,6 @@ import {
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   View,
 } from 'react-native';
@@ -26,6 +25,7 @@ import {
 } from '../../hooks/useQuranSettings';
 import type { UseQuranDownloads } from '../../hooks/useQuranDownloads';
 import { READER_THEME_LIST } from '../../theme/quranReaderThemes';
+import SettingToggle from './SettingToggle';
 import { colors, fontFamily, quranFontFamily, radius, spacing } from '../../theme/tokens';
 
 const FONT_OPTIONS: { key: ArabicFont; label: string }[] = [
@@ -42,6 +42,7 @@ export default function ReaderSettingsSheet({
   downloads,
   onOpenLibrary,
   onOpenRecitation,
+  onOpenTajweedLegend,
 }: {
   visible: boolean;
   onClose: () => void;
@@ -49,6 +50,7 @@ export default function ReaderSettingsSheet({
   downloads: UseQuranDownloads;
   onOpenLibrary: () => void;
   onOpenRecitation?: () => void;
+  onOpenTajweedLegend?: () => void;
 }) {
   const { settings } = controls;
   const atMin = settings.arabicFontSize <= MIN_ARABIC_FONT;
@@ -197,36 +199,28 @@ export default function ReaderSettingsSheet({
             </View>
 
             <Text style={styles.section}>DISPLAY</Text>
-            <View style={styles.toggleRow}>
-              <Text style={styles.toggleLabel}>Transliteration</Text>
-              <Switch
-                value={settings.showTransliteration}
-                onValueChange={controls.toggleTransliteration}
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={colors.white}
-                ios_backgroundColor={colors.border}
-              />
-            </View>
-            <View style={styles.toggleRow}>
-              <Text style={styles.toggleLabel}>Translation</Text>
-              <Switch
-                value={settings.showTranslation}
-                onValueChange={controls.toggleTranslation}
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={colors.white}
-                ios_backgroundColor={colors.border}
-              />
-            </View>
-            <View style={styles.toggleRow}>
-              <Text style={styles.toggleLabel}>Word by word</Text>
-              <Switch
-                value={settings.showWordByWord}
-                onValueChange={controls.toggleWordByWord}
-                trackColor={{ false: colors.border, true: colors.primary }}
-                thumbColor={colors.white}
-                ios_backgroundColor={colors.border}
-              />
-            </View>
+            <SettingToggle
+              label="Transliteration"
+              value={settings.showTransliteration}
+              onValueChange={controls.toggleTransliteration}
+            />
+            <SettingToggle
+              label="Translation"
+              value={settings.showTranslation}
+              onValueChange={controls.toggleTranslation}
+            />
+            <SettingToggle
+              label="Word by word"
+              value={settings.showWordByWord}
+              onValueChange={controls.toggleWordByWord}
+            />
+            <SettingToggle
+              label="Tajwīd colours"
+              hint="Colour the Arabic by its recitation rules."
+              value={settings.showTajweed}
+              onValueChange={controls.toggleTajweed}
+              onInfo={onOpenTajweedLegend}
+            />
 
             <Text style={styles.section}>TRANSLATION</Text>
             {BUNDLED_TRANSLATIONS.map((ed) => {
@@ -317,7 +311,7 @@ export default function ReaderSettingsSheet({
 
 const styles = StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheet: {
     maxHeight: '85%',
     backgroundColor: colors.card,
@@ -411,13 +405,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: colors.foreground,
   },
-  toggleRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingVertical: spacing.sm,
-  },
-  toggleLabel: { fontFamily, fontSize: 15, color: colors.foreground },
   transRow: {
     flexDirection: 'row',
     alignItems: 'center',

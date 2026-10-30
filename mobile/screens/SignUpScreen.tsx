@@ -16,6 +16,8 @@ import Input from '../components/ui/Input';
 import PasswordStrength from '../components/ui/PasswordStrength';
 import { AppleIcon, GoogleIcon } from '../components/ui/BrandIcons';
 import { isValidEmail } from '../lib/validation';
+import { splitTemplate } from '../lib/template';
+import { useT } from '../i18n/LocaleContext';
 import { spacing, typography } from '../theme/tokens';
 import { useTheme, useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
@@ -24,36 +26,38 @@ export default function SignUpScreen({
   onSignIn,
   onTerms,
   onPrivacy,
-  onAuthenticated,
+  onSubmit,
 }: {
   onSignIn?: () => void;
   onTerms?: () => void;
   onPrivacy?: () => void;
-  onAuthenticated?: () => void;
+  onSubmit?: (name: string, email: string, password: string) => Promise<string | null>;
 }) {
   const { colors } = useTheme();
   const styles = useThemedStyles(makeStyles);
+  const t = useT();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [touched, setTouched] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState<string | null>(null);
 
   const emailError = useMemo(
-    () => (touched && email && !isValidEmail(email) ? 'Enter a valid email address' : undefined),
-    [email, touched],
+    () => (touched && email && !isValidEmail(email) ? t('auth.email.invalid') : undefined),
+    [email, touched, t],
   );
 
   const canSubmit = name.trim().length > 1 && isValidEmail(email) && password.length >= 8;
 
-  const submit = () => {
+  const submit = async () => {
     setTouched(true);
     if (!canSubmit) return;
+    setFormError(null);
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
-      onAuthenticated?.();
-    }, 1400); // placeholder for real auth
+    const error = await onSubmit?.(name, email, password);
+    setLoading(false);
+    if (error) setFormError(error);
   };
 
   return (
@@ -71,33 +75,33 @@ export default function SignUpScreen({
         </View>
 
         <View style={styles.header}>
-          <Text style={styles.title}>Create your account</Text>
-          <Text style={styles.subtitle}>Begin your journey with Adl</Text>
+          <Text style={styles.title}>{t('auth.signUp.title')}</Text>
+          <Text style={styles.subtitle}>{t('auth.signUp.subtitle')}</Text>
         </View>
 
         <View style={styles.social}>
           <Button
-            label="Continue with Apple"
+            label={t('auth.social.apple')}
             variant="secondary"
-            onPress={onAuthenticated}
+            onPress={() => setFormError('Social sign-in needs the Adl cloud — use your email for now.')}
             icon={<AppleIcon size={18} color={colors.foreground} />}
           />
           <Button
-            label="Continue with Google"
+            label={t('auth.social.google')}
             variant="secondary"
-            onPress={onAuthenticated}
+            onPress={() => setFormError('Social sign-in needs the Adl cloud — use your email for now.')}
             icon={<GoogleIcon size={18} />}
           />
         </View>
 
         <View style={styles.dividerWrap}>
-          <Divider label="or continue with email" />
+          <Divider label={t('auth.signUp.divider')} />
         </View>
 
         <View style={styles.form}>
           <Input
-            label="Full name"
-            placeholder="Aisha Rahman"
+            label={t('auth.name.label')}
+            placeholder={t('auth.name.placeholder')}
             value={name}
             onChangeText={setName}
             autoCapitalize="words"
@@ -105,8 +109,8 @@ export default function SignUpScreen({
             icon={<User size={18} color={colors.mutedForeground} />}
           />
           <Input
-            label="Email"
-            placeholder="you@example.com"
+            label={t('auth.email.label')}
+            placeholder={t('auth.email.placeholder')}
             value={email}
             onChangeText={setEmail}
             onBlur={() => setTouched(true)}
@@ -117,8 +121,8 @@ export default function SignUpScreen({
           />
           <View>
             <Input
-              label="Password"
-              placeholder="At least 8 characters"
+              label={t('auth.password.label')}
+              placeholder={t('auth.password.newPlaceholder')}
               value={password}
               onChangeText={setPassword}
               isPassword
@@ -129,8 +133,12 @@ export default function SignUpScreen({
           </View>
         </View>
 
+        {formError ? (
+          <Text style={{ color: colors.destructive, textAlign: 'center', marginTop: spacing.md, fontSize: 13 }}>{formError}</Text>
+        ) : null}
+
         <Button
-          label="Create account"
+          label={t('auth.signUp.submit')}
           onPress={submit}
           loading={loading}
           disabled={!canSubmit}
@@ -138,15 +146,25 @@ export default function SignUpScreen({
         />
 
         <Text style={styles.terms}>
-          By continuing, you agree to Adl&apos;s{' '}
-          <Text style={styles.link} onPress={onTerms}>Terms</Text> and{' '}
-          <Text style={styles.link} onPress={onPrivacy}>Privacy Policy</Text>.
+          {splitTemplate(t('auth.terms.agree'), ['terms', 'privacy']).map((part, i) =>
+            part.kind === 'text' ? (
+              <Text key={i}>{part.value}</Text>
+            ) : (
+              <Text
+                key={i}
+                style={styles.link}
+                onPress={part.name === 'terms' ? onTerms : onPrivacy}
+              >
+                {part.name === 'terms' ? t('auth.terms.terms') : t('auth.terms.privacy')}
+              </Text>
+            ),
+          )}
         </Text>
 
         <View style={styles.footer}>
-          <Text style={styles.footerText}>Already have an account? </Text>
+          <Text style={styles.footerText}>{t('auth.signUp.hasAccount')}</Text>
           <Pressable onPress={onSignIn} hitSlop={8}>
-            <Text style={styles.footerLink}>Sign in</Text>
+            <Text style={styles.footerLink}>{t('auth.signUp.signInLink')}</Text>
           </Pressable>
         </View>
       </ScrollView>

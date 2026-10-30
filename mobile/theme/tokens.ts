@@ -36,12 +36,12 @@ export const spacing = {
 } as const;
 
 export const typography = {
-  display: { fontSize: 28, fontWeight: '700' as const, letterSpacing: -0.5 },
-  title: { fontSize: 22, fontWeight: '700' as const, letterSpacing: -0.3 },
-  body: { fontSize: 15, fontWeight: '400' as const },
-  label: { fontSize: 13, fontWeight: '500' as const },
-  caption: { fontSize: 13, fontWeight: '400' as const },
-  button: { fontSize: 15, fontWeight: '600' as const },
+  display: { fontSize: 28, lineHeight: 36, fontWeight: '700' as const, letterSpacing: 0 },
+  title: { fontSize: 22, lineHeight: 30, fontWeight: '700' as const, letterSpacing: 0 },
+  body: { fontSize: 16, lineHeight: 24, fontWeight: '400' as const, letterSpacing: 0 },
+  label: { fontSize: 14, lineHeight: 20, fontWeight: '500' as const, letterSpacing: 0 },
+  caption: { fontSize: 13, lineHeight: 20, fontWeight: '400' as const, letterSpacing: 0 },
+  button: { fontSize: 16, lineHeight: 24, fontWeight: '600' as const, letterSpacing: 0 },
 } as const;
 
 export const fontFamily = Platform.select({

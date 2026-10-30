@@ -129,7 +129,7 @@ export default function TasbihBead({
 const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   wrap: { alignItems: 'center', justifyContent: 'center' },
   pressed: { opacity: 0.94 },
-  center: { ...StyleSheet.absoluteFillObject, alignItems: 'center', justifyContent: 'center' },
+  center: { ...StyleSheet.absoluteFill, alignItems: 'center', justifyContent: 'center' },
   roundPill: {
     paddingHorizontal: spacing.sm,
     paddingVertical: 2,

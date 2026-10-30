@@ -10,7 +10,7 @@
  * stored numbers, persists them and answers with vibration.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import * as Haptics from 'expo-haptics';
 import {
   currentStreak,

@@ -5,7 +5,7 @@
  * keeps membership checks O(1). Every mutation writes through to storage.
  */
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '../lib/scopedStorage';
 import { ayahKey } from '../lib/quran';
 
 const BOOKMARKS_KEY = 'adl.quran.bookmarks.v1';

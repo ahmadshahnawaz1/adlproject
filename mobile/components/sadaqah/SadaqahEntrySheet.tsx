@@ -24,7 +24,8 @@ import {
   type CharityEntry,
   type CharityInput,
 } from '../../lib/charity';
-import { colors, fontFamily, radius, spacing, typography } from '../../theme/tokens';
+import { fontFamily, radius, spacing, typography } from '../../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../../theme/ThemeContext';
 import { CATEGORY_ICONS } from './categoryIcons';
 
 export default function SadaqahEntrySheet({
@@ -45,6 +46,8 @@ export default function SadaqahEntrySheet({
   onSubmit: (input: CharityInput) => void;
   onDelete?: (id: string) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   const [amount, setAmount] = useState('');
   const [category, setCategory] = useState<CharityCategory>(DEFAULT_CHARITY_CATEGORY);
   const [recipientId, setRecipientId] = useState<string | undefined>(undefined);
@@ -215,9 +218,9 @@ export default function SadaqahEntrySheet({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   root: { flex: 1, justifyContent: 'flex-end' },
-  backdrop: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.6)' },
+  backdrop: { ...StyleSheet.absoluteFill, backgroundColor: 'rgba(0,0,0,0.6)' },
   sheet: {
     maxHeight: '85%',
     backgroundColor: colors.card,

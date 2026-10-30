@@ -16,7 +16,8 @@ import {
   type LucideIcon,
 } from 'lucide-react-native';
 import type { LearnTopic, LearnTopicId } from '../../content/learn';
-import { arabicFont, colors, fontFamily, radius, spacing, typography } from '../../theme/tokens';
+import { arabicFont, fontFamily, radius, spacing, typography } from '../../theme/tokens';
+import { useTheme, useThemedStyles, type ThemeColors } from '../../theme/ThemeContext';
 
 const ICONS: Record<string, LucideIcon> = { Sprout, Footprints, Gem, Scale };
 
@@ -30,6 +31,8 @@ export default function TopicGrid({
   hint: (id: LearnTopicId) => string;
   onSelect: (id: LearnTopicId) => void;
 }) {
+  const { colors } = useTheme();
+  const styles = useThemedStyles(makeStyles);
   return (
     <View style={styles.grid}>
       {topics.map((topic) => {
@@ -72,7 +75,7 @@ export default function TopicGrid({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   grid: { gap: spacing.md },
   card: {
     padding: spacing.md,

@@ -6,7 +6,8 @@
 import { StyleSheet, Text, View } from 'react-native';
 import type { Ashra } from '../content/fasting';
 import type { RamadanInfo } from '../lib/fasting';
-import { arabicFont, colors, radius, spacing, typography } from '../theme/tokens';
+import { arabicFont, radius, spacing, typography } from '../theme/tokens';
+import { useThemedStyles, type ThemeColors } from '../theme/ThemeContext';
 
 const CELLS = Array.from({ length: 30 }, (_, i) => i + 1);
 
@@ -19,6 +20,7 @@ export default function RamadanProgressStrip({
   ashra: Ashra;
   showArabic?: boolean;
 }) {
+  const styles = useThemedStyles(makeStyles);
   const pct = Math.round((info.day / 30) * 100);
   return (
     <View style={styles.card}>
@@ -62,7 +64,7 @@ export default function RamadanProgressStrip({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: ThemeColors) => StyleSheet.create({
   card: {
     padding: spacing.lg,
     borderRadius: radius.lg,

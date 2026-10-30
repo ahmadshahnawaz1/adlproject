@@ -1,24 +1,21 @@
 /**
  * lib/learn — the pure logic over the Learning Hub content.
  *
- * Adds a forgiving, diacritic-insensitive search across the lessons and the
- * Sīrah timeline, small helpers to read the plain text out of a lesson's
- * blocks, the grouping of lessons under their section headers, and the
- * progress maths for the guided "New Muslim" path. Everything here is pure and
- * synchronous, so it is fully covered by tests.
+ * Adds a forgiving, diacritic-insensitive search across the lessons, small
+ * helpers to read the plain text out of a lesson's blocks, the grouping of
+ * lessons under their section headers, and the progress maths for the guided
+ * "New Muslim" path. Everything here is pure and synchronous, so it is fully
+ * covered by tests. The Sīrah lives in its own graded corpus (lib/sirah).
  */
 import {
   ALL_LESSONS,
-  SIRAH_EVENTS,
   LEARN_TOPICS,
   NEW_MUSLIM_TRACK,
   lessonById,
   lessonsInTopic,
   topicById,
-  sirahEventById,
   type Lesson,
   type LessonBlock,
-  type SirahEvent,
   type Track,
   type TrackStep,
 } from '../content/learn';
@@ -26,13 +23,11 @@ import { normalizeText, queryTokens } from './duaSearch';
 
 export {
   ALL_LESSONS,
-  SIRAH_EVENTS,
   LEARN_TOPICS,
   NEW_MUSLIM_TRACK,
   lessonById,
   lessonsInTopic,
   topicById,
-  sirahEventById,
 };
 export { normalizeText, queryTokens };
 
@@ -64,9 +59,7 @@ export function bodyText(body: LessonBlock[]): string {
 }
 
 /** A unified search hit, tagged by which collection it came from. */
-export type LearnSearchHit =
-  | { kind: 'lesson'; lesson: Lesson }
-  | { kind: 'sirah'; event: SirahEvent };
+export type LearnSearchHit = { kind: 'lesson'; lesson: Lesson };
 
 function scoreTokens(haystackHigh: string, haystackLow: string, tokens: string[]): number {
   const high = normalizeText(haystackHigh);
@@ -94,25 +87,9 @@ export function searchLessons(query: string): Lesson[] {
     .map((r) => r.lesson);
 }
 
-/** Search the Sīrah timeline. Empty query → []. */
-export function searchSirah(query: string): SirahEvent[] {
-  const tokens = queryTokens(query);
-  if (tokens.length === 0) return [];
-  return SIRAH_EVENTS.map((event) => {
-    const high = `${event.title} ${event.arabic ?? ''} ${event.place} ${event.year} ${(event.tags ?? []).join(' ')}`;
-    const low = `${event.summary} ${bodyText(event.body)}`;
-    return { event, score: scoreTokens(high, low, tokens) };
-  })
-    .filter((r) => r.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .map((r) => r.event);
-}
-
-/** Search lessons and the Sīrah together, lessons first. Empty query → []. */
+/** Search the Learning Hub. Empty query → []. */
 export function searchLearn(query: string): LearnSearchHit[] {
-  const lessons: LearnSearchHit[] = searchLessons(query).map((lesson) => ({ kind: 'lesson', lesson }));
-  const sirah: LearnSearchHit[] = searchSirah(query).map((event) => ({ kind: 'sirah', event }));
-  return [...lessons, ...sirah];
+  return searchLessons(query).map((lesson) => ({ kind: 'lesson', lesson }));
 }
 
 /** A lesson group: a section header and its lessons, preserving order. */
@@ -171,4 +148,4 @@ export function isTrackComplete(
   return trackProgress(completedIds, track) >= 1;
 }
 
-export type { Lesson, LessonBlock, SirahEvent, Track, TrackStep };
+export type { Lesson, LessonBlock, Track, TrackStep };
